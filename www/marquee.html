@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="utf-8">
-<title>Now Playing Recalbox — Marquee</title>
+<title>Astrocity - Marquee</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#03050a">
 <meta name="mobile-web-app-capable" content="yes">
@@ -212,6 +212,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--white);
   background:rgba(1,2,4,.55);border:1px solid var(--line);border-radius:8px;overflow:hidden;
   position:relative;box-shadow:0 0 28px rgba(63,195,224,.08);
 }
+.right.cycle{cursor:pointer;-webkit-tap-highlight-color:transparent}
 .right img{
   position:absolute;inset:0;width:100%;height:100%;object-fit:contain;opacity:0;
   transition:opacity .35s;
@@ -281,6 +282,9 @@ html:-webkit-full-screen #fs-btn{display:none}
   var NEXT_MAX = 3;
   var isPlaying = false;
   var nowGame = '';
+  var artList = [];
+  var artIndex = 0;
+  var artKey = '';
   var lastRa = null;
   var raPollMs = 10000;
   var raTimer = null;
@@ -334,6 +338,36 @@ html:-webkit-full-screen #fs-btn{display:none}
     }
   }
 
+  function setArtCycle(list, key) {
+    var box = $('art');
+    var items = [];
+    if (Array.isArray(list)) {
+      for (var i = 0; i < list.length; i++) {
+        var a = list[i];
+        if (a && a.url) items.push(a);
+      }
+    }
+    if (key !== artKey) {
+      artKey = key || '';
+      artIndex = 0;
+    }
+    artList = items;
+    if (artList.length > 1) box.classList.add('cycle');
+    else box.classList.remove('cycle');
+    if (!artList.length) {
+      setArt(null);
+      return;
+    }
+    if (artIndex >= artList.length) artIndex = 0;
+    setArt(artList[artIndex].url);
+  }
+
+  function cycleArt() {
+    if (artList.length < 2) return;
+    artIndex = (artIndex + 1) % artList.length;
+    setArt(artList[artIndex].url);
+  }
+
   function setArt(url) {
     var box = $('art');
     var img = $('art-img');
@@ -346,7 +380,20 @@ html:-webkit-full-screen #fs-btn{display:none}
     if (url === lastArt) return;
     lastArt = url;
     img.onload = function () { box.classList.add('has'); };
-    img.onerror = function () { box.classList.remove('has'); lastArt = ''; };
+    img.onerror = function () {
+      box.classList.remove('has');
+      lastArt = '';
+      // Skip broken URL and try next if cycling
+      if (artList.length > 1) {
+        artList.splice(artIndex, 1);
+        if (!artList.length) {
+          box.classList.remove('cycle');
+          return;
+        }
+        if (artIndex >= artList.length) artIndex = 0;
+        setArt(artList[artIndex].url);
+      }
+    };
     img.src = url;
   }
 
@@ -393,7 +440,7 @@ html:-webkit-full-screen #fs-btn{display:none}
       setText('title', 'Recalbox offline');
       setText('system', null);
       setText('year', null);
-      setArt(null);
+      setArtCycle([], 'offline');
       requestAnimationFrame(fitHeadline);
       return;
     }
@@ -404,7 +451,10 @@ html:-webkit-full-screen #fs-btn{display:none}
       setText('title', d.systemFullName || d.system || 'Sistema');
       setText('system', 'Selecciona un juego');
       setText('year', null);
-      setArt(d.boxUrl || d.imageUrl || null);
+      setArtCycle(
+        d.boxUrl ? [{ type: 'logo', url: d.boxUrl }] : [],
+        'system:' + (d.systemId || d.system || '')
+      );
       requestAnimationFrame(fitHeadline);
       return;
     }
@@ -417,7 +467,10 @@ html:-webkit-full-screen #fs-btn{display:none}
       setText('system', d.systemFullName || d.system || null);
       setText('year', null);
       $('meta').textContent = joinMeta([d.genre, d.players, d.region]);
-      setArt(d.boxUrl || d.imageUrl || null);
+      setArtCycle(
+        (d.art && d.art.length) ? d.art : (d.boxUrl || d.imageUrl ? [{ type: 'box', url: d.boxUrl || d.imageUrl }] : []),
+        'gl:' + (d.gamePath || d.game || '')
+      );
       requestAnimationFrame(fitHeadline);
       return;
     }
@@ -427,7 +480,7 @@ html:-webkit-full-screen #fs-btn{display:none}
       setText('title', 'En el menu');
       setText('system', null);
       setText('year', null);
-      setArt(null);
+      setArtCycle([], 'menu');
       requestAnimationFrame(fitHeadline);
       return;
     }
@@ -447,7 +500,10 @@ html:-webkit-full-screen #fs-btn{display:none}
     setText('system', d.systemFullName || d.system || DASH);
     setText('year', (d.releaseYear !== null && d.releaseYear !== undefined && d.releaseYear !== '') ? d.releaseYear : null);
     $('meta').textContent = joinMeta([d.genre, d.players, d.region]);
-    setArt(d.boxUrl || d.imageUrl || null);
+    setArtCycle(
+      (d.art && d.art.length) ? d.art : (d.boxUrl || d.imageUrl ? [{ type: 'box', url: d.boxUrl || d.imageUrl }] : []),
+      'play:' + (d.gamePath || gameName)
+    );
     requestAnimationFrame(fitHeadline);
     applyRa(lastRa);
     setRaPoll((lastRa && lastRa.matchesCurrent) ? 5000 : 3000);
@@ -710,6 +766,11 @@ html:-webkit-full-screen #fs-btn{display:none}
   }
 
   window.addEventListener('resize', function () { fitHeadline(); });
+
+  $('art').addEventListener('click', function (e) {
+    e.preventDefault();
+    cycleArt();
+  });
 
   pollNow();
   setRaPoll(10000);

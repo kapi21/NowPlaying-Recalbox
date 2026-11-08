@@ -3,6 +3,7 @@ from __future__ import annotations
 from datetime import datetime, timezone
 from typing import Any
 
+from np.game_art import build_game_art
 from np.paths import media_url, system_logo_url
 
 
@@ -25,7 +26,12 @@ def _str(v: Any) -> str | None:
     return s if s else None
 
 
-def now_playing_dto(status: dict | None, online: bool, detail: dict | None = None) -> dict:
+def now_playing_dto(
+    status: dict | None,
+    online: bool,
+    detail: dict | None = None,
+    share_root: str | None = None,
+) -> dict:
     now = datetime.now(timezone.utc).isoformat().replace('+00:00', 'Z')
     detail_nulls = {
         'rating': None, 'playCount': None, 'lastPlayed': None, 'releaseYear': None,
@@ -40,6 +46,7 @@ def now_playing_dto(status: dict | None, online: bool, detail: dict | None = Non
             'gamePath': None, 'imageUrl': None, 'updatedAt': now,
             'boxUrl': None, 'developer': None, 'publisher': None,
             'players': None, 'region': None, 'genre': None,
+            'art': [],
             **detail_nulls,
         }
 
@@ -69,11 +76,20 @@ def now_playing_dto(status: dict | None, online: bool, detail: dict | None = Non
 
     image_url = None
     box_url = None
-    if show_game:
+    art: list = []
+    if show_game and isinstance(game, dict):
+        art = build_game_art(game, share_root=share_root)
         img = _str(_g(game, 'ImagePath')) or _str(_g(game, 'BoxPath'))
         image_url = media_url(img) if img else None
         box = _str(_g(game, 'BoxPath'))
         box_url = media_url(box) if box else None
+        if art:
+            # Prefer box as primary; else first available art
+            box_from_art = next((a['url'] for a in art if a.get('type') == 'box'), None)
+            box_url = box_from_art or art[0]['url']
+            img_from_art = next((a['url'] for a in art if a.get('type') == 'image'), None)
+            if img_from_art:
+                image_url = img_from_art
 
     developer = publisher = players = region = genre = None
     if show_game:
@@ -102,6 +118,7 @@ def now_playing_dto(status: dict | None, online: bool, detail: dict | None = Non
             game_path = None
             image_url = None
             box_url = None
+            art = []
             developer = publisher = players = region = genre = None
             fav = False
 
@@ -125,6 +142,7 @@ def now_playing_dto(status: dict | None, online: bool, detail: dict | None = Non
         'players': players,
         'region': region,
         'genre': genre,
+        'art': art,
         **detail_fields,
     }
     if not out.get('systemFullName') and _g(status, '_systemFullName'):
@@ -132,4 +150,5 @@ def now_playing_dto(status: dict | None, online: bool, detail: dict | None = Non
     if state == 'system':
         out['boxUrl'] = system_logo_url(system_id)
         out['imageUrl'] = None
+        out['art'] = []
     return out

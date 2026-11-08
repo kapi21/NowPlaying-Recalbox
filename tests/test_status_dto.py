@@ -38,6 +38,8 @@ class TestStatusDto(unittest.TestCase):
         self.assertTrue(d['imageUrl'].startswith('/media?path='))
         self.assertEqual(d['releaseYear'], 1996)
         self.assertEqual(d['developer'], 'SNK')
+        self.assertGreaterEqual(len(d['art']), 1)
+        self.assertEqual(d['art'][0]['type'], 'box')
 
     def test_gamelist_browsing(self):
         status = {

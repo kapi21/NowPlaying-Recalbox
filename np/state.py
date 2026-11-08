@@ -198,7 +198,7 @@ class NowPlayingState:
                             self._detail_at = time.time()
                 detail = self._detail
 
-        return now_playing_dto(status, online, detail)
+        return now_playing_dto(status, online, detail, share_root=self.share_root)
 
     def build_hw(self) -> dict[str, Any]:
         now = time.time()
