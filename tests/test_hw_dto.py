@@ -39,6 +39,10 @@ class TestHwDto(unittest.TestCase):
         self.assertTrue(d['mqtt']['ok'])
         self.assertEqual(d['temp']['c'], 39.7)
         self.assertEqual(d['cpu']['cores'], ['2.5', '20.4', '19', '26.3'])
+        self.assertEqual(d['video']['mode'], '320x240')
+        self.assertFalse(d['video']['interlaced'])
+        self.assertEqual(d['video']['screenType'], '15kHz')
+        self.assertEqual(d['video']['panelButtons'], 6)
 
 
 if __name__ == '__main__':

@@ -6,6 +6,12 @@ import subprocess
 from typing import Any
 
 
+CRT_OPTIONS_CANDIDATES = (
+    '/boot/crt/recalbox-crt-options.cfg',
+    '/recalbox/share/system/configs/crt/recalbox-crt-options.cfg',
+)
+
+
 def _read_text(path: str) -> str | None:
     try:
         with open(path, 'r', encoding='utf-8', errors='replace') as f:
@@ -20,6 +26,47 @@ def _vcgencmd(*args: str) -> str | None:
         return out.strip()
     except (OSError, subprocess.SubprocessError):
         return None
+
+
+def parse_fb_mode(modes: str | None, virtual_size: str | None) -> tuple[str | None, bool]:
+    """Parse framebuffer mode from sysfs (same contract as PC SSH probe)."""
+    if modes:
+        m = re.search(r'(\d+)x(\d+)([pi])?', modes, re.IGNORECASE)
+        if m:
+            return f'{m.group(1)}x{m.group(2)}', (m.group(3) or '').lower() == 'i'
+    if virtual_size:
+        m = re.match(r'^(\d+)\s*,\s*(\d+)$', virtual_size.strip())
+        if m:
+            return f'{m.group(1)}x{m.group(2)}', False
+    return None, False
+
+
+def parse_crt_options(text: str | None) -> tuple[int | None, int | None]:
+    """Parse screen type + panel buttons from recalbox-crt-options.cfg."""
+    if not text:
+        return None, None
+    screen_type = None
+    panel_buttons = None
+    for line in text.splitlines():
+        s = line.strip()
+        if not s or s.startswith('#'):
+            continue
+        if '=' not in s:
+            continue
+        key, _, val = s.partition('=')
+        key = key.strip()
+        val = val.strip()
+        if key == 'options.screen.type':
+            try:
+                screen_type = int(val)
+            except ValueError:
+                pass
+        elif key == 'options.jamma.controls.panel_buttons':
+            try:
+                panel_buttons = int(val)
+            except ValueError:
+                pass
+    return screen_type, panel_buttons
 
 
 def read_local_probe() -> dict[str, Any]:
@@ -74,15 +121,21 @@ def read_local_probe() -> dict[str, Any]:
         except ValueError:
             pass
 
-    # fb mode (best-effort)
-    for cand in (
-        '/sys/class/graphics/fb0/virtual_size',
-        '/sys/class/graphics/fb0/modes',
-    ):
-        t = _read_text(cand)
-        if t:
-            if 'x' in t.lower():
-                probe['fbMode'] = t.split(',')[0].strip().split('\n')[0].strip()
-            break
+    modes = _read_text('/sys/class/graphics/fb0/modes')
+    if modes:
+        modes = modes.split('\n', 1)[0].strip()
+    vsize = _read_text('/sys/class/graphics/fb0/virtual_size')
+    mode, interlaced = parse_fb_mode(modes, vsize)
+    probe['fbMode'] = mode
+    probe['fbInterlaced'] = interlaced
+
+    for cand in CRT_OPTIONS_CANDIDATES:
+        cfg = _read_text(cand)
+        if cfg is None:
+            continue
+        st, pb = parse_crt_options(cfg)
+        probe['screenType'] = st
+        probe['panelButtons'] = pb
+        break
 
     return probe
