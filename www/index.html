@@ -142,7 +142,7 @@ dl.kv dd{font-size:.97em;line-height:1.15;min-width:0;overflow-wrap:anywhere;
 .na{color:#43565c}
 .stars{color:var(--cream);letter-spacing:.08em;text-shadow:0 0 6px rgba(240,240,160,.5)}
 .stars .e{color:#27343a;text-shadow:none}
-.syn{flex:1 1 0;min-height:0;display:flex;flex-direction:column;margin-top:.5em;border-top:1px solid var(--line);padding-top:.35em}
+.syn{flex:0 1 auto;min-height:0;max-height:30%;display:flex;flex-direction:column;margin-top:.5em;border-top:1px solid var(--line);padding-top:.35em}
 .syn[hidden]{display:none}
 .syn button{flex:none;font:inherit;font-family:var(--disp);font-style:italic;background:none;border:0;color:var(--mint);cursor:default;pointer-events:none;text-transform:uppercase;letter-spacing:.18em;font-size:.72em;text-align:left;padding:0}
 .syn p{flex:1 1 0;min-height:1.3em;margin-top:.25em;font-size:.95em;line-height:1.3;color:#c3d3d6;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere;
@@ -180,10 +180,10 @@ body.off .box .body{opacity:.55}
 #hw-up{letter-spacing:.05em;font-family:var(--cond);font-style:normal;font-weight:700}
 
 /* Logros / RetroAchievements (debajo de la sinopsis, columna del juego) */
-#box-ra{flex:none;margin-top:.6em;border-radius:6px;box-shadow:0 0 0 1px var(--line),0 0 10px rgba(240,240,160,.08)}
+#box-ra{flex:1 1 0;min-height:0;margin-top:.6em;border-radius:6px;box-shadow:0 0 0 1px var(--line),0 0 10px rgba(240,240,160,.08)}
 #box-ra[hidden]{display:none}
-#box-ra h2{font-size:.7em;padding:.3em .8em}
-#box-ra .body{flex:none;padding:.45em .7em .5em;gap:.3em;overflow:hidden}
+#box-ra h2{flex:none;font-size:.7em;padding:.3em .8em}
+#box-ra .body{flex:1 1 0;min-height:0;padding:.45em .7em .5em;gap:.3em;overflow:hidden;display:flex;flex-direction:column}
 .ra-head{flex:none;display:flex;flex-direction:column;gap:.2em;min-width:0}
 #ra-rp{font-size:.98em;line-height:1.2;color:var(--cyan);font-weight:600;
   display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:1;line-clamp:1;overflow:hidden;overflow-wrap:anywhere}
@@ -191,8 +191,8 @@ body.off .box .body{opacity:.55}
 #ra-tag{font-family:var(--cond);font-style:normal;font-size:1em;font-weight:700;letter-spacing:.06em;color:var(--coral);text-transform:none;opacity:.9}
 #ra-tag[hidden]{display:none}
 .ra-list{
-  flex:none;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.25em .8em;list-style:none;
-  max-height:calc(var(--u)*9.5);overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch;
+  flex:1 1 0;min-height:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.25em .8em;list-style:none;
+  align-content:start;overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch;
 }
 .ra-list > li.done{grid-column:1 / -1;font-family:var(--disp);font-style:italic;font-weight:900;letter-spacing:.12em;
   text-transform:uppercase;color:var(--mint);font-size:.95em;padding:.15em 0}
@@ -225,7 +225,7 @@ body.off .box .body{opacity:.55}
   .box .body{padding:.5em .6em}
   .sep{margin:.3em 0}
   #box-ra .body{padding:.35em .55em .4em}
-  .ra-list{grid-template-columns:minmax(0,1fr);max-height:calc(var(--u)*8)}
+  .ra-list{grid-template-columns:minmax(0,1fr)}
 }
 /* Tablet vertical: carátula y juego lado a lado */
 @media (max-aspect-ratio:1/1) and (min-width:700px){
