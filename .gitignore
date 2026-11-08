@@ -1,0 +1,31 @@
+# Secrets / local machine
+*.local.txt
+ra.local.txt
+ssh.local.txt
+ss.local.txt
+config.env
+.env
+
+# Runtime
+logs/
+*.pid
+__pycache__/
+*.py[cod]
+.Python
+.venv/
+venv/
+
+# Optional ADB (not shipped)
+bin/adb*
+bin/lib/
+.android/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+
+# Screenshots may be large WIP — keep placeholders tracked
+# docs/screenshots/*.png is allowed when you add them

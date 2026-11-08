@@ -1,0 +1,3 @@
+# Copy to /recalbox/share/now-playing/ra.local.txt (never commit the real file)
+user=YOUR_RETROACHIEVEMENTS_USER
+apikey=YOUR_RETROACHIEVEMENTS_WEB_API_KEY
