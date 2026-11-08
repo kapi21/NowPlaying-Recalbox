@@ -4,6 +4,16 @@
 
 Sirve páginas web desde la propia Pi (`:8787`). Cualquier móvil, tablet o navegador en la misma WiFi puede abrirlas.
 
+### Tablet o Android que casi no usas
+
+Si tienes una **tablet o un móvil Android** aparcado, no hace falta instalar nada especial: abre el **navegador** (Chrome, etc.), conéctate a la **misma WiFi** que la Recalbox y entra en:
+
+```text
+http://<IP-DE-TU-RECALBOX>:8787/marquee
+```
+
+Ahí verás el juego actual (título, sistema, carátula) y, si configuras RetroAchievements, el **progreso / pendientes de logros** mientras juegas en la cabina o en el salón. Gira el dispositivo a **horizontal** para la vista marquee; la ruta `/` vale también en vertical para un resumen más “móvil”.
+
 > Trabajo en curso: esta v0 publica el **núcleo servidor + UI actual**. La UI genérica / multi-dispositivo se pulirá en siguientes iteraciones. Ver [docs/PRODUCTIZATION.md](docs/PRODUCTIZATION.md).
 
 ---
