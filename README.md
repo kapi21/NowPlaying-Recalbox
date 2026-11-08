@@ -26,6 +26,8 @@ Ahí verás el juego actual (título, sistema, carátula) y, si configuras Retro
 
 ![Marquee gamelist](docs/screenshots/marquee-gamelist.png)
 
+![Vista móvil /](docs/screenshots/mobile-now.png)
+
 ---
 
 ## Características
