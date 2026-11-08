@@ -381,8 +381,6 @@ body.off .box .body{opacity:.55}
         <div class="body">
           <dl class="kv">
             <div><dt>Modo</dt><dd id="v-mode">—</dd></div>
-            <div><dt>Frecuencia H</dt><dd id="v-khz">—</dd></div>
-            <div><dt>Refresco</dt><dd id="v-hz">—</dd></div>
             <div><dt>Pantalla</dt><dd id="v-type">—</dd></div>
             <div><dt>Botones panel</dt><dd id="v-btn">—</dd></div>
           </dl>
@@ -599,7 +597,7 @@ body.off .box .body{opacity:.55}
     thr.textContent = ''; src.textContent = '';
     var cores = $('cores'); cores.textContent = '';
     if (!h || !h.online) {
-      ['t-val','c-avg','r-val','c-freq','c-load','p-volt','v-mode','v-khz','v-hz','v-type','v-btn','s-val','ver-rb','ver-k','ver-ra'].forEach(function (i) { setT(i, null); });
+      ['t-val','c-avg','r-val','c-freq','c-load','p-volt','v-mode','v-type','v-btn','s-val','ver-rb','ver-k','ver-ra'].forEach(function (i) { setT(i, null); });
       setT('hw-up', null);
       $('t-val').className = 'bigtemp';
       ['t-bar','c-bar','r-bar','s-bar'].forEach(function (i) { setBar(i, null); });
@@ -673,9 +671,6 @@ body.off .box .body{opacity:.55}
     // Vídeo
     var v = h.video || null;
     setT('v-mode', v && v.mode ? v.mode + (v.interlaced ? 'i' : 'p') : null);
-    var khz = v ? num(v.khz) : null, hz = v ? num(v.hz) : null;
-    setT('v-khz', khz === null ? null : khz.toFixed(1) + ' kHz');
-    setT('v-hz', hz === null ? null : hz.toFixed(1) + ' Hz');
     setT('v-type', v ? v.screenType : null);
     setT('v-btn', v ? v.panelButtons : null);
 
