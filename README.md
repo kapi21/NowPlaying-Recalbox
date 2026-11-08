@@ -14,7 +14,7 @@ Sirve páginas web desde la propia Pi (`:8787`). Cualquier móvil, tablet o nave
 
 ![Marquee sistemas](docs/screenshots/marquee-system.png)
 
-*Pendiente:* `marquee-gamelist.png` (lista de juegos). Convención: [docs/screenshots/README.md](docs/screenshots/README.md).
+![Marquee gamelist](docs/screenshots/marquee-gamelist.png)
 
 ---
 
