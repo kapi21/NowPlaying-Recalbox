@@ -10,15 +10,9 @@ Sirve páginas web desde la propia Pi (`:8787`). Cualquier móvil, tablet o nave
 
 ## Capturas
 
-Espacio reservado — añade PNG en [`docs/screenshots/`](docs/screenshots/) y enlázalos aquí:
-
-```markdown
 ![Marquee jugando](docs/screenshots/marquee-playing.png)
-![Marquee sistemas](docs/screenshots/marquee-system.png)
-![Vista móvil](docs/screenshots/mobile-now.png)
-```
 
-Nombres sugeridos y convención: [docs/screenshots/README.md](docs/screenshots/README.md).
+*Pendientes:* `marquee-system.png` (carrusel sistemas), `marquee-gamelist.png` (lista de juegos). Convención: [docs/screenshots/README.md](docs/screenshots/README.md).
 
 ---
 
