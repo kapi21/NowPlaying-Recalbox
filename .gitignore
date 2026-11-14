@@ -29,3 +29,6 @@ Thumbs.db
 
 # Screenshots may be large WIP — keep placeholders tracked
 # docs/screenshots/*.png is allowed when you add them
+
+# Logos propios (grandes, material de terceros): carpeta logos/ en la Pi
+logos/

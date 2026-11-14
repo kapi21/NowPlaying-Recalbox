@@ -61,6 +61,17 @@ def system_logo_url(system_id: str) -> str | None:
     return '/system-logo?id=' + quote(str(system_id).strip(), safe='')
 
 
+def resolve_custom_logo(custom_root: str, system_id: str) -> str | None:
+    """Logo propio: <custom_root>/<system_id>.png (ids Recalbox, minúsculas)."""
+    if not custom_root or not is_safe_system_id(system_id):
+        return None
+    base = os.path.join(os.path.abspath(custom_root), str(system_id).strip().lower())
+    for ext in ('.png', '.svg'):
+        if os.path.isfile(base + ext):
+            return base + ext
+    return None
+
+
 def resolve_system_logo(logo_root: str, system_id: str) -> str | None:
     if not is_safe_system_id(system_id):
         return None

@@ -11,7 +11,7 @@ from urllib.parse import parse_qs, unquote, urlparse
 ROOT = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, ROOT)
 
-from np.paths import is_safe_relative, resolve_share_file, is_safe_system_id, resolve_system_logo  # noqa: E402
+from np.paths import is_safe_relative, resolve_share_file, is_safe_system_id, resolve_system_logo, resolve_custom_logo  # noqa: E402
 from np.ra_fetch import fetch_ra_img  # noqa: E402
 from np.state import NowPlayingState  # noqa: E402
 
@@ -23,6 +23,7 @@ SYSTEM_LOGO_ROOT = os.environ.get(
     'NP_SYSTEM_LOGO_ROOT',
     '/recalbox/share_init/system/.emulationstation/themes/recalbox-next/data/arts/systems_logos',
 )
+CUSTOM_LOGO_ROOT = os.environ.get('NP_CUSTOM_LOGO_ROOT', os.path.join(ROOT, 'logos'))
 ES_STATE = os.environ.get('NP_ES_STATE', '/tmp/es_state.inf')
 RA_CREDS = os.environ.get('NP_RA_CREDS', os.path.join(ROOT, 'ra.local.txt'))
 
@@ -105,11 +106,11 @@ class Handler(SimpleHTTPRequestHandler):
             if not is_safe_system_id(sid):
                 self._send(400, b'Invalid id', 'text/plain; charset=utf-8')
                 return
-            full = resolve_system_logo(SYSTEM_LOGO_ROOT, sid)
+            full = resolve_custom_logo(CUSTOM_LOGO_ROOT, sid) or resolve_system_logo(SYSTEM_LOGO_ROOT, sid)
             if not full:
                 self._send(404, b'Not found', 'text/plain; charset=utf-8')
                 return
-            self._send_file(full, 'image/png', cache='public, max-age=86400')
+            self._send_file(full, 'image/svg+xml' if full.endswith('.svg') else 'image/png', cache='no-cache')
             return
 
         if path == '/media':

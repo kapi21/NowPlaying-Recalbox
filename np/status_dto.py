@@ -151,4 +151,6 @@ def now_playing_dto(
         out['boxUrl'] = system_logo_url(system_id)
         out['imageUrl'] = None
         out['art'] = []
+    elif state == 'menu':
+        out['boxUrl'] = system_logo_url('recalboxlogo')
     return out

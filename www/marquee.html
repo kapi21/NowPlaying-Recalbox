@@ -219,8 +219,8 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--white);
 }
 .right.has img{opacity:1}
 .right .ph{
-  position:relative;z-index:1;color:var(--muted);letter-spacing:.2em;text-transform:uppercase;
-  font-size:calc(var(--u)*.65);text-align:center;padding:1em;
+  position:absolute;inset:0;z-index:1;font-size:0;color:transparent;
+  background:url('/system-logo?id=recalbox') center/55% no-repeat;opacity:.13;
 }
 .right.has .ph{display:none}
 
@@ -480,7 +480,7 @@ html:-webkit-full-screen #fs-btn{display:none}
       setText('title', 'En el menu');
       setText('system', null);
       setText('year', null);
-      setArtCycle([], 'menu');
+      setArtCycle(d.boxUrl ? [{ type: 'logo', url: d.boxUrl }] : [], 'menu');
       requestAnimationFrame(fitHeadline);
       return;
     }
