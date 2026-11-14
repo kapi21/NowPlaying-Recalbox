@@ -46,7 +46,8 @@ def resolve_share_file(share_root: str, rel: str) -> str | None:
     return full
 
 
-_SYSTEM_ID_RE = re.compile(r'^[a-zA-Z0-9._-]+$')
+# Permite espacios internos simples (p. ej. coleccion 'arcade-manufacturer-data east')
+_SYSTEM_ID_RE = re.compile(r'^[a-zA-Z0-9._-]+( [a-zA-Z0-9._-]+)*$')
 
 
 def is_safe_system_id(system_id: str) -> bool:

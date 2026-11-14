@@ -32,7 +32,7 @@ STATE = NowPlayingState(
     share_root=SHARE_ROOT,
     es_state_path=ES_STATE,
     ra_creds_path=RA_CREDS,
-    enable_workers=True,
+    enable_workers=os.environ.get('NP_WORKERS', '1') != '0',
 )
 
 

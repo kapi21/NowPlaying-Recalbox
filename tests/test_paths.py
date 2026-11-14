@@ -41,7 +41,8 @@ class TestSystemLogoPaths(unittest.TestCase):
         self.assertTrue(is_safe_system_id('auto-arcade-capcom.cps2'))
         self.assertFalse(is_safe_system_id(''))
         self.assertFalse(is_safe_system_id('../fbneo'))
-        self.assertFalse(is_safe_system_id('fb neo'))
+        self.assertTrue(is_safe_system_id('data east'))
+        self.assertFalse(is_safe_system_id('fb  neo'))
         self.assertFalse(is_safe_system_id('fb/neo'))
 
     def test_system_logo_url(self):
