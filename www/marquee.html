@@ -279,6 +279,7 @@ html:-webkit-full-screen #fs-btn{display:none}
   var $ = function (id) { return document.getElementById(id); };
   var DASH = '-';
   var lastArt = '';
+  var failedArt = {};
   var NEXT_MAX = 3;
   var isPlaying = false;
   var nowGame = '';
@@ -377,12 +378,20 @@ html:-webkit-full-screen #fs-btn{display:none}
       img.removeAttribute('src');
       return;
     }
+    if (failedArt[url] && Date.now() - failedArt[url] < 60000) {
+      lastArt = url;
+      box.classList.remove('has');
+      img.removeAttribute('src');
+      return;
+    }
+    if (failedArt[url]) { delete failedArt[url]; lastArt = ''; }
     if (url === lastArt) return;
     lastArt = url;
     img.onload = function () { box.classList.add('has'); };
     img.onerror = function () {
       box.classList.remove('has');
-      lastArt = '';
+      failedArt[url] = Date.now();
+      lastArt = url;
       // Skip broken URL and try next if cycling
       if (artList.length > 1) {
         artList.splice(artIndex, 1);

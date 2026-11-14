@@ -41,6 +41,12 @@ class Handler(SimpleHTTPRequestHandler):
         super().__init__(*args, directory=WWW, **kwargs)
 
     def log_message(self, fmt, *args):
+        # No registrar el polling de la API (miles de peticiones) ni 304
+        line = args[0] if args else ''
+        if isinstance(line, str) and (' /api/' in line or ' /ra-img' in line):
+            return
+        if len(args) > 1 and str(args[1]) == '304':
+            return
         sys.stderr.write("%s - %s\n" % (self.address_string(), fmt % args))
 
     def _send(self, code: int, body: bytes, content_type: str, headers: dict | None = None):
@@ -65,6 +71,29 @@ class Handler(SimpleHTTPRequestHandler):
         ctype = content_type or mimetypes.guess_type(path)[0] or 'application/octet-stream'
         headers = {'Cache-Control': cache} if cache else None
         self._send(200, data, ctype, headers)
+
+    def _send_logo(self, path: str):
+        """Logo con ETag (mtime+size): revalida y devuelve 304 si no cambió."""
+        try:
+            st = os.stat(path)
+        except OSError:
+            self._send(404, b'Not found', 'text/plain; charset=utf-8')
+            return
+        etag = '"%x-%x"' % (int(st.st_mtime), st.st_size)
+        if self.headers.get('If-None-Match') == etag:
+            self.send_response(304)
+            self.send_header('ETag', etag)
+            self.send_header('Cache-Control', 'no-cache')
+            self.end_headers()
+            return
+        try:
+            with open(path, 'rb') as f:
+                data = f.read()
+        except OSError:
+            self._send(404, b'Not found', 'text/plain; charset=utf-8')
+            return
+        ctype = 'image/svg+xml' if path.endswith('.svg') else 'image/png'
+        self._send(200, data, ctype, {'ETag': etag, 'Cache-Control': 'no-cache'})
 
     def do_GET(self):
         parsed = urlparse(self.path)
@@ -108,9 +137,9 @@ class Handler(SimpleHTTPRequestHandler):
                 return
             full = resolve_custom_logo(CUSTOM_LOGO_ROOT, sid) or resolve_system_logo(SYSTEM_LOGO_ROOT, sid)
             if not full:
-                self._send(404, b'Not found', 'text/plain; charset=utf-8')
+                self._send(404, b'Not found', 'text/plain; charset=utf-8', {'Cache-Control': 'max-age=60'})
                 return
-            self._send_file(full, 'image/svg+xml' if full.endswith('.svg') else 'image/png', cache='no-cache')
+            self._send_logo(full)
             return
 
         if path == '/media':

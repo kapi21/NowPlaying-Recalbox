@@ -25,6 +25,12 @@ if [ -f "$PIDFILE" ]; then
   rm -f "$PIDFILE"
 fi
 
+# Rotar log: si pasa de 512 KB, conservar solo las ultimas 500 lineas
+LOGF="$ROOT/logs/now-playing.log"
+if [ -f "$LOGF" ] && [ "$(wc -c < "$LOGF")" -gt 524288 ]; then
+  tail -n 500 "$LOGF" > "$LOGF.tmp" && mv "$LOGF.tmp" "$LOGF"
+fi
+
 export NP_API_BASE="${NP_API_BASE:-http://127.0.0.1:81}"
 export NP_SHARE_ROOT="${NP_SHARE_ROOT:-/recalbox/share}"
 export NP_PORT="${NP_PORT:-8787}"
