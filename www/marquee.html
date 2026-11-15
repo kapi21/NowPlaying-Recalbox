@@ -668,7 +668,9 @@ html:-webkit-full-screen #fs-btn{display:none}
     }
     setRaPoll(5000);
 
-    if (d.completed) {
+    if (d.noAchievements) {
+      $('next-label').textContent = 'Sin logros';
+    } else if (d.completed) {
       $('next-label').textContent = 'Completado';
     } else if (d.progressOk && Array.isArray(d.pending)) {
       var prog = progressionPending(d.pending);
@@ -686,7 +688,9 @@ html:-webkit-full-screen #fs-btn{display:none}
     }
 
     var line = document.createElement('span');
-    if (d.completed) {
+    if (d.noAchievements) {
+      line.textContent = '';
+    } else if (d.completed) {
       line.textContent = 'Completado';
     } else if (d.currentGame && d.currentGame.total) {
       var a = fmtN(d.currentGame.achieved) || '0';

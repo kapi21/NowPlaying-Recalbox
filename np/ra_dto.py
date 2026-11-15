@@ -53,6 +53,7 @@ def ra_dto(summary: dict | None, progress: dict | None = None, current_game_name
         'ok': False, 'user': None, 'rank': None, 'totalPoints': None, 'softcorePoints': None,
         'truePoints': None, 'motto': None, 'richPresence': None, 'richPresenceAgeSec': None,
         'currentGame': None, 'pending': [], 'completed': False, 'progressOk': False,
+        'noAchievements': False,
         'recent': [], 'matchesCurrent': False,
     }
     if not summary or not str(summary.get('User') or '').strip():
@@ -101,6 +102,7 @@ def ra_dto(summary: dict | None, progress: dict | None = None, current_game_name
 
     pending: list[dict] = []
     completed = False
+    no_achievements = False
     progress_ok = False
     progress_to_use = None
     if progress is not None:
@@ -111,6 +113,8 @@ def ra_dto(summary: dict | None, progress: dict | None = None, current_game_name
 
     if progress_to_use is not None:
         achs = progress_to_use.get('Achievements') or {}
+        if isinstance(achs, list) and not achs:
+            achs = {}  # PHP devuelve [] cuando el juego no tiene logros
         if isinstance(achs, dict):
             progress_ok = True
             num = 0
@@ -135,6 +139,8 @@ def ra_dto(summary: dict | None, progress: dict | None = None, current_game_name
                 })
             pending.sort(key=lambda x: (x['displayOrder'], -x['points'], x['title']))
             completed = num > 0 and len(pending) == 0
+            # Juego reconocido por RA pero sin logros (p. ej. Mille Miglia 2): NO es «completado»
+            no_achievements = num == 0
 
     recent: list[dict] = []
     ra_map = summary.get('RecentAchievements') or {}
@@ -176,6 +182,7 @@ def ra_dto(summary: dict | None, progress: dict | None = None, current_game_name
         'pending': pending,
         'completed': completed,
         'progressOk': progress_ok,
+        'noAchievements': no_achievements,
         'recent': recent,
         'matchesCurrent': ra_title_match(game['title'] if game else None, current_game_name) if game else False,
     }

@@ -54,6 +54,35 @@ class TestRaDto(unittest.TestCase):
         self.assertEqual(d['pending'][0]['title'], 'Todo')
         self.assertFalse(d['completed'])
 
+    def _summary(self, gid, total):
+        return {
+            'User': 'tester', 'LastGameID': str(gid), 'TotalPoints': 1,
+            'RecentlyPlayed': [{'GameID': str(gid), 'Title': 'Mille Miglia 2', 'ConsoleName': 'Arcade',
+                                'AchievementsTotal': total}],
+            'Awarded': {str(gid): {'NumPossibleAchievements': total, 'NumAchieved': 0,
+                                   'ScoreAchieved': 0, 'PossibleScore': 0}},
+        }
+
+    def test_game_without_achievements_is_not_completed(self):
+        for empty in ({}, []):
+            d = ra_dto(self._summary(12161, 0), {'ID': 12161, 'NumAchievements': 0, 'Achievements': empty})
+            self.assertTrue(d['progressOk'])
+            self.assertTrue(d['noAchievements'])
+            self.assertFalse(d['completed'])
+            self.assertEqual(d['pending'], [])
+
+    def test_completed_game_is_not_no_achievements(self):
+        progress = {'ID': 5, 'Achievements': {
+            '1': {'Title': 'Done', 'Points': 5, 'BadgeName': 'a', 'DateEarnedHardcore': '2024-01-01', 'DisplayOrder': 1}}}
+        d = ra_dto(self._summary(5, 1), progress)
+        self.assertTrue(d['completed'])
+        self.assertFalse(d['noAchievements'])
+
+    def test_no_progress_yet_is_not_no_achievements(self):
+        d = ra_dto(self._summary(5, 1), None)
+        self.assertFalse(d['noAchievements'])
+        self.assertFalse(d['progressOk'])
+
     def test_recent(self):
         summary = {
             'User': 'tester', 'LastGameID': '10', 'TotalPoints': 1,

@@ -716,7 +716,12 @@ body.off .box .body{opacity:.55}
       setT('ra-gt', null); setT('ra-cnt', null); setBar('ra-bar', null);
     }
     var pending = Array.isArray(d.pending) ? d.pending : [];
-    if (d.completed) {
+    if (d.noAchievements) {
+      var none = document.createElement('li');
+      none.className = 'na';
+      none.textContent = 'Este juego no tiene logros en RetroAchievements';
+      list.appendChild(none);
+    } else if (d.completed) {
       var done = document.createElement('li');
       done.className = 'done';
       done.textContent = 'Completado';
