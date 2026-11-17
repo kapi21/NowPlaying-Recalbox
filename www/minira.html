@@ -744,10 +744,10 @@ html:-webkit-full-screen #fs-btn{display:none}
       line.textContent = t('minira.ra_done', 'Completado');
     } else if (d.currentGame && d.currentGame.total) {
       var a = fmtN(d.currentGame.achieved) || '0';
-      var t = fmtN(d.currentGame.total);
+      var tot = fmtN(d.currentGame.total);
       var sc = fmtN(d.currentGame.score);
       var ps = fmtN(d.currentGame.possibleScore);
-      line.textContent = a + '/' + t + (sc !== null && ps !== null ? ' · ' + sc + '/' + ps + ' pts' : '');
+      line.textContent = a + '/' + tot + (sc !== null && ps !== null ? ' · ' + sc + '/' + ps + ' pts' : '');
     } else {
       line.textContent = '';
     }
