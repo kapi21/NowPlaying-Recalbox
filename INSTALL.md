@@ -42,9 +42,10 @@ sh /recalbox/share/now-playing/start-now-playing.sh
 Abre en el móvil/tablet (misma WiFi):
 
 ```text
-http://<IP-DE-LA-RECALBOX>:8787/marquee
+http://<IP-DE-LA-RECALBOX>:8787/minira
 http://<IP-DE-LA-RECALBOX>:8787/
 ```
+# /marquee redirige a /minira
 
 Parada:
 
@@ -57,7 +58,7 @@ sh /recalbox/share/now-playing/stop-now-playing.sh
 No incluido en el repo. Si quieres despertar una tablet Android al boot:
 
 1. Coloca un `adb` Linux compatible en `bin/` (ver `wake-marquee.sh`)
-2. Exporta `NP_TABLET=IP:5555` y `NP_MARQUEE_URL=http://IP-RECALBOX:8787/marquee?fs=1`
+2. Exporta `NP_TABLET=IP:5555` y `NP_MARQUEE_URL=http://IP-RECALBOX:8787/minira?fs=1`
 
 ## Tests (en PC o Pi)
 

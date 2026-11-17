@@ -1,9 +1,9 @@
 #!/bin/sh
-# Optional: wake Android tablet + open Chrome marquee (requires local ADB binary)
+# Optional: wake Android tablet + open Chrome MiniRA (requires local ADB binary)
 # Set NP_TABLET and NP_MARQUEE_URL before use. ADB binary is NOT shipped in this repo.
 NP=/recalbox/share/now-playing
 TABLET="${NP_TABLET:-}"
-URL="${NP_MARQUEE_URL:-http://127.0.0.1:8787/marquee?fs=1}"
+URL="${NP_MARQUEE_URL:-http://127.0.0.1:8787/minira?fs=1}"
 LOG="${NP}/logs/wake-marquee.log"
 if [ -z "$TABLET" ]; then
   echo "NP_TABLET not set (e.g. 192.168.x.x:5555); skip wake" >>"$LOG"

@@ -12,11 +12,11 @@ Servidor HTTP LAN en la Recalbox (Python 3, puerto **8787**) que lee el estado d
 
 | Ruta | Uso |
 | --- | --- |
-| `/marquee` | Vista landscape para tablet / marquee |
-| `/` | Vista “ahora jugando” (móvil / PWA) |
+| `/minira` | Vista landscape para tablet (MiniRA); `/marquee` → 302 |
+| `/` | Vista “ahora jugando” (móvil / escritorio) |
 | `/api/now` | Estado juego / menú |
 | `/api/ra` | RetroAchievements (opcional) |
-| `/api/hw` | Hardware Pi (opcional) |
+| `/api/hw` | Hardware Pi + red (opcional) |
 | `/system-logo` | Logo de sistema (tema Recalbox) |
 | `/media` | Imágenes desde el share |
 
@@ -75,7 +75,7 @@ Desacoplar Batocera / otros frontends = fase posterior (adaptadores de “estado
 - [x] `LICENSE` MIT
 - [x] Ejemplos `config/`
 - [x] Tests unitarios incluidos
-- [ ] Capturas reales en `docs/screenshots/`
+- [x] Capturas reales en `docs/screenshots/`
 - [ ] Install one-liner / script de copia documentado y probado en Pi limpia
 - [ ] mDNS / hostname en README
 - [ ] Skin UI sin marca de cabina concreta

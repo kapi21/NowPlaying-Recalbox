@@ -12,7 +12,7 @@ Si tienes una **tablet o un móvil Android** aparcado, no hace falta instalar na
 http://<IP-DE-TU-RECALBOX>:8787/minira
 ```
 
-Ahí verás el juego actual (título, sistema, carátula) y, si configuras RetroAchievements, el **progreso / pendientes de logros** mientras juegas en la cabina o en el salón. Gira el dispositivo a **horizontal** para MiniRA; la ruta `/` vale también en vertical para un resumen más “móvil”. (`/marquee` redirige a `/minira`.)
+Ahí verás el juego actual (título, sistema, flyer) y, si configuras RetroAchievements, el **progreso / pendientes de logros** mientras juegas. Gira el dispositivo a **horizontal** para MiniRA; la ruta `/` vale en vertical u horizontal para un panel más completo (“ahora jugando” + hardware + red). La ruta antigua `/marquee` redirige a `/minira`.
 
 > Trabajo en curso: esta v0 publica el **núcleo servidor + UI actual**. La UI genérica / multi-dispositivo se pulirá en siguientes iteraciones. Ver [docs/PRODUCTIZATION.md](docs/PRODUCTIZATION.md).
 
@@ -32,10 +32,12 @@ Ahí verás el juego actual (título, sistema, carátula) y, si configuras Retro
 
 ## Características
 
-- Vista **`/minira`** landscape (tablet): título, sistema, flyer, logros RA (en juego)
-- Vista **`/`** tipo “ahora jugando” + hardware Pi + red
+- Vista **`/minira`** landscape (tablet): título, sistema, flyer, logros RA en juego (badges + progreso)
+- Vista **`/`**: metadatos del juego, arte (imagen + caja + wheel), hardware Pi, red (WiFi/IP/gateway) y RA
 - API JSON: `/api/now`, `/api/ra`, `/api/hw`
-- Logos de sistema en el carrusel (`/system-logo`)
+- Logos de sistema en el carrusel (`/system-logo`) y media del scrap (`/media`)
+- Wheel/logos con resolución fuzzy cuando el scrap usa hashes distintos
+- Fuente **Arcade R** en ambas UIs
 - Parseo correcto de fechas Recalbox (timestamp Unix → año)
 - Arranque con userscript EmulationStation `[start]`
 - Sin dependencias pip: Python 3 de la imagen Recalbox
@@ -64,22 +66,29 @@ http://<IP-RECALBOX>:8787/
 
 ## RetroAchievements (opcional)
 
-Copia `config/ra.local.txt.example` → `ra.local.txt` en la carpeta del servidor y rellena usuario + API key web. **No subas ese fichero a git.**
+```sh
+cp config/ra.local.txt.example /recalbox/share/now-playing/ra.local.txt
+# editar user= y apikey= (API key web de RA)
+```
+
+**No subas** `ra.local.txt` a git. Variables opcionales: ver `config/env.example`.
 
 ## Estructura
 
 ```text
 server.py              # HTTP :8787
-np/                    # estado ES, RA, DTO, años, paths
-www/                   # minira + index
+np/                    # estado ES, RA, DTO, arte, hardware, paths
+www/                   # index (/) + minira + redirect marquee
+www/fonts/             # Arcade R
+config/                # ejemplos ra.local.txt / env
 tests/                 # unittest
 userscripts/           # nowplaying[start].ash
 start|stop-now-playing.sh
 wake-marquee.sh        # opcional (ADB no incluido; abre MiniRA)
+INSTALL.md
 docs/PRODUCTIZATION.md # roadmap producto / compartir
 docs/screenshots/      # capturas para el README
 ```
-
 
 ## Tests
 
