@@ -654,7 +654,10 @@ body.off .box .body{opacity:.55}
     setStatus('on', d.state === 'playing' ? t('status.playing', 'Jugando') : (d.action || t('status.active', 'Activo')));
 
     if (d.gamePath !== cur.gamePath) {
-      var t = $('g-title'); t.classList.remove('fade'); void t.offsetWidth; t.classList.add('fade');
+      var titleEl = $('g-title');
+      titleEl.classList.remove('fade');
+      void titleEl.offsetWidth;
+      titleEl.classList.add('fade');
       cur.gamePath = d.gamePath || null;
     }
     $('g-title').textContent = d.game || DASH;
