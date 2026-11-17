@@ -134,15 +134,16 @@ body.off #offline{display:block}
   text-transform:uppercase;letter-spacing:.06em;font-size:.85em;text-align:center;background:#010204;border-radius:5px;border:1px solid var(--line);position:relative}
 .cover-empty[hidden]{display:none}
 .cover-empty svg{width:min(8em,60%);max-height:50%;height:auto;opacity:.85}
-.cover-empty.menu-logo{justify-content:center;align-items:center}
-.cover-empty.menu-logo svg{display:none}
-.cover-empty.menu-logo #ph-text{display:none}
-.cover-empty .menu-logo-img{
-  display:none;position:static;width:auto;height:auto;max-width:72%;max-height:62%;
-  margin:0;object-fit:contain;opacity:.95;pointer-events:none;
-  filter:drop-shadow(0 0 18px rgba(63,195,224,.25))
+.cover-empty.menu-logo{
+  justify-content:center;align-items:center;
+  background-image:var(--menu-logo,url('/system-logo?id=recalboxlogo'));
+  background-repeat:no-repeat;background-position:center center;
+  background-size:min(78%,280px) auto;
 }
-.cover-empty.menu-logo .menu-logo-img{display:block}
+.cover-empty.menu-logo svg,
+.cover-empty.menu-logo #ph-text,
+.cover-empty.menu-logo .menu-logo-img{display:none!important}
+.cover-empty .menu-logo-img{display:none}
 
 /* Ficha */
 .title{flex:none;font-family:var(--disp);font-style:normal;font-weight:normal;font-size:calc(var(--tu)*1.7);line-height:1.1;text-transform:uppercase;letter-spacing:.02em;margin-bottom:.15em;
@@ -551,11 +552,11 @@ body.off .box .body{opacity:.55}
   }
   function showMenuLogo(logoUrl) {
     clearArt();
-    var img = document.querySelector('#cover-empty .menu-logo-img');
     var src = logoUrl || '/system-logo?id=recalboxlogo';
-    if (img && img.getAttribute('src') !== src) img.src = src;
+    var empty = $('cover-empty');
+    empty.style.setProperty('--menu-logo', 'url("' + src + '")');
     setCoverStackEmpty(true);
-    $('cover-empty').classList.add('menu-logo');
+    empty.classList.add('menu-logo');
     $('ph-text').textContent = t('menu.title', 'En el menú');
   }
   function renderArt(map) {
