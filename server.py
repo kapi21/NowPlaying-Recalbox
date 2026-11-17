@@ -11,6 +11,7 @@ from urllib.parse import parse_qs, unquote, urlparse
 ROOT = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, ROOT)
 
+from np.locale import resolve_lang  # noqa: E402
 from np.paths import is_safe_relative, resolve_share_file, is_safe_system_id, resolve_system_logo, resolve_custom_logo  # noqa: E402
 from np.ra_fetch import fetch_ra_img  # noqa: E402
 from np.state import NowPlayingState  # noqa: E402
@@ -101,6 +102,8 @@ class Handler(SimpleHTTPRequestHandler):
 
         if path == '/api/now':
             dto = STATE.build_now()
+            if isinstance(dto, dict):
+                dto['lang'] = resolve_lang()
             body = json.dumps(dto, ensure_ascii=False).encode('utf-8')
             self._send(200, body, 'application/json; charset=utf-8')
             return

@@ -1,5 +1,7 @@
 # Instalación (Recalbox)
 
+**Español** · [English](INSTALL.en.md)
+
 Requisitos: **Recalbox ≥ 10** (probado en 10.1.1), Python 3 en la imagen, red LAN.
 
 ## 1. Copiar al share
@@ -59,6 +61,10 @@ No incluido en el repo. Si quieres despertar una tablet Android al boot:
 
 1. Coloca un `adb` Linux compatible en `bin/` (ver `wake-marquee.sh`)
 2. Exporta `NP_TABLET=IP:5555` y `NP_MARQUEE_URL=http://IP-RECALBOX:8787/minira?fs=1`
+
+## Idioma
+
+La UI sigue `system.language` de Recalbox (`es` / `en`; el resto cae a inglés). Override: `NP_LANG=en` o `NP_LANG=es` (ver `config/env.example`).
 
 ## Tests (en PC o Pi)
 

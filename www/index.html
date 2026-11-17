@@ -130,9 +130,13 @@ body.off #offline{display:block}
 .cover-frame img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;opacity:0;transition:opacity .35s}
 .cover-frame.has img{opacity:1}
 .cover-empty{flex:1 1 0;min-height:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:.6em;color:var(--muted);
-  text-transform:uppercase;letter-spacing:.06em;font-size:.85em;text-align:center;background:#010204;border-radius:5px;border:1px solid var(--line)}
+  text-transform:uppercase;letter-spacing:.06em;font-size:.85em;text-align:center;background:#010204;border-radius:5px;border:1px solid var(--line);position:relative}
 .cover-empty[hidden]{display:none}
 .cover-empty svg{width:min(8em,60%);max-height:50%;height:auto;opacity:.85}
+.cover-empty.menu-logo svg{display:none}
+.cover-empty.menu-logo #ph-text{position:relative;z-index:1;color:var(--cyan);text-shadow:0 0 12px rgba(63,195,224,.35)}
+.cover-empty .menu-logo-img{display:none;position:absolute;inset:12%;width:auto;height:auto;max-width:76%;max-height:76%;margin:auto;object-fit:contain;opacity:.55;pointer-events:none}
+.cover-empty.menu-logo .menu-logo-img{display:block}
 
 /* Ficha */
 .title{flex:none;font-family:var(--disp);font-style:normal;font-weight:normal;font-size:calc(var(--tu)*1.7);line-height:1.1;text-transform:uppercase;letter-spacing:.02em;margin-bottom:.15em;
@@ -287,7 +291,7 @@ body.off .box .body{opacity:.55}
 </head>
 <body>
 <div id="pwa-hint" role="dialog" aria-label="Instalar sin barra de Chrome">
-  <h3>Pantalla completa (sin barra)</h3>
+  <h3 data-i18n="pwa.title">Pantalla completa (sin barra)</h3>
   <p>Chrome exige HTTPS para PWA. En LAN se fuerza así:</p>
   <ol>
     <li>En Chrome, abre <code>chrome://flags/#unsafely-treat-insecure-origin-as-secure</code></li>
@@ -296,74 +300,75 @@ body.off .box .body{opacity:.55}
     <li>Vuelve aquí → menú ⋮ → <b>Instalar aplicación</b> / <b>Añadir a pantalla de inicio</b></li>
   </ol>
   <p>Abre el icono <b>Now Playing</b> (no la pestaña). En iPhone: Safari → Compartir → Añadir a inicio (HTTP vale).</p>
-  <div class="row"><button type="button" id="pwa-copy">Copiar origen</button><button type="button" id="pwa-hide">Entendido</button></div>
+  <div class="row"><button type="button" id="pwa-copy" data-i18n="pwa.copy">Copiar origen</button><button type="button" id="pwa-hide" data-i18n="pwa.hide">Entendido</button></div>
 </div>
 <div class="app">
   <header>
     <h1><span class="rb">Now Playing Recalbox</span></h1>
     <div class="hbar">
-      <span class="pill"><span class="dot" id="dot"></span><span id="state">Conectando…</span></span>
+      <span class="pill"><span class="dot" id="dot"></span><span id="state" data-i18n="status.connecting">Conectando…</span></span>
       <span id="clock">--:--:--</span>
     </div>
   </header>
-  <div id="offline" role="status">Recalbox offline · sin datos</div>
+  <div id="offline" role="status" data-i18n="offline.banner">Recalbox offline · sin datos</div>
 
   <main class="grid">
     <!-- Arte: imagen + caja + wheel -->
     <section class="box" id="box-cover" aria-label="Arte del juego">
-      <h2><span>Arte</span></h2>
+      <h2><span data-i18n="art.section">Arte</span></h2>
       <div class="body">
         <div class="cover-stack" id="cover-stack">
           <div class="cover-slot" data-type="image" hidden>
-            <div class="lab">Imagen</div>
+            <div class="lab" data-i18n="art.image">Imagen</div>
             <div class="cover-frame"><img alt="Imagen del juego"></div>
           </div>
           <div class="cover-slot" data-type="box" hidden>
-            <div class="lab">Caja</div>
+            <div class="lab" data-i18n="art.box">Caja</div>
             <div class="cover-frame"><img alt="Caja del juego"></div>
           </div>
           <div class="cover-slot" data-type="wheel" hidden>
-            <div class="lab">Logo</div>
+            <div class="lab" data-i18n="art.wheel">Logo</div>
             <div class="cover-frame"><img alt="Logo wheel del juego"></div>
           </div>
         </div>
         <div class="cover-empty" id="cover-empty">
+          <img class="menu-logo-img" src="/system-logo?id=recalbox" alt="" aria-hidden="true">
           <svg viewBox="0 0 120 90" fill="none" stroke="#3FC3E0" stroke-width="3" aria-hidden="true">
             <rect x="8" y="8" width="104" height="62" rx="6"/><path d="M40 82h40M60 70v12"/>
             <path d="M44 28l22 12-22 12z" fill="#F0507A" stroke="#F0507A"/>
           </svg>
-          <span id="ph-text">Sin arte</span>
+          <span id="ph-text" data-i18n="art.empty">Sin arte</span>
         </div>
       </div>
     </section>
 
     <!-- Juego -->
     <section class="box" id="box-game" aria-label="Juego">
-      <h2><span>Juego</span><span id="fav" hidden>★ Favorito</span></h2>
+      <h2><span data-i18n="game.section">Juego</span><span id="fav" hidden data-i18n="game.favorite">★ Favorito</span></h2>
       <div class="body">
         <div class="title" id="g-title" aria-live="polite">—</div>
         <div class="sub" id="g-sys">—</div>
         <dl class="kv cols2">
-          <div><dt>Tipo</dt><dd id="g-type">—</dd></div>
-          <div><dt>Género</dt><dd id="g-genre">—</dd></div>
-          <div><dt>Jugadores</dt><dd id="g-players">—</dd></div>
-          <div><dt>Región</dt><dd id="g-region">—</dd></div>
-          <div><dt>Año</dt><dd id="g-year">—</dd></div>
-          <div><dt>Valoración</dt><dd id="g-rating">—</dd></div>
-          <div><dt>Desarrollador</dt><dd id="g-dev">—</dd></div>
-          <div><dt>Editor</dt><dd id="g-pub">—</dd></div>
-          <div><dt>Veces jugado</dt><dd id="g-count">—</dd></div>
-          <div><dt>Última partida</dt><dd id="g-last">—</dd></div>
-          <div><dt>Emulador / core</dt><dd id="g-core">—</dd></div>
-          <div><dt>CRC32</dt><dd id="g-crc">—</dd></div>
+          <div><dt data-i18n="game.type">Tipo</dt><dd id="g-type">—</dd></div>
+          <div><dt data-i18n="game.genre">Género</dt><dd id="g-genre">—</dd></div>
+          <div><dt data-i18n="game.players">Jugadores</dt><dd id="g-players">—</dd></div>
+          <div><dt data-i18n="game.region">Región</dt><dd id="g-region">—</dd></div>
+          <div><dt data-i18n="game.year">Año</dt><dd id="g-year">—</dd></div>
+          <div><dt data-i18n="game.rating">Valoración</dt><dd id="g-rating">—</dd></div>
+          <div><dt data-i18n="game.developer">Desarrollador</dt><dd id="g-dev">—</dd></div>
+          <div><dt data-i18n="game.publisher">Editor</dt><dd id="g-pub">—</dd></div>
+          <div><dt data-i18n="game.playcount">Veces jugado</dt><dd id="g-count">—</dd></div>
+          <div><dt data-i18n="game.lastplayed">Última partida</dt><dd id="g-last">—</dd></div>
+          <div><dt data-i18n="game.core">Emulador / core</dt><dd id="g-core">—</dd></div>
+          <div><dt data-i18n="game.crc">CRC32</dt><dd id="g-crc">—</dd></div>
         </dl>
         <div class="syn" id="syn" hidden>
-          <button type="button" id="syn-btn" aria-expanded="false">Sinopsis ▾</button>
+          <button type="button" id="syn-btn" aria-expanded="false" data-i18n="game.synopsis_open">Sinopsis ▾</button>
           <p id="g-syn"></p>
         </div>
         <!-- Logros / RetroAchievements -->
         <section class="box" id="box-ra" aria-label="Logros RetroAchievements" hidden>
-          <h2><span>Logros · RetroAchievements</span><span id="ra-tag" hidden>último juego RA</span></h2>
+          <h2><span data-i18n="ra.section">Logros · RetroAchievements</span><span id="ra-tag" hidden data-i18n="ra.tag_last">último juego RA</span></h2>
           <div class="body">
             <div class="ra-head">
               <div id="ra-rp">—</div>
@@ -382,29 +387,29 @@ body.off .box .body{opacity:.55}
     <div class="side">
       <!-- Sistema -->
       <section class="box" id="box-sys" aria-label="Estado del sistema">
-        <h2><span>Sistema</span><span id="hw-up">—</span></h2>
+        <h2><span data-i18n="sys.section">Sistema</span><span id="hw-up">—</span></h2>
         <div class="body">
-          <div class="mrow"><span>Temperatura</span><span class="bigtemp" id="t-val">—</span></div>
+          <div class="mrow"><span data-i18n="sys.temp">Temperatura</span><span class="bigtemp" id="t-val">—</span></div>
           <div class="bar" id="t-bar"><i></i></div>
           <div class="sep"></div>
-          <div class="mrow"><span>CPU media</span><b id="c-avg">—</b></div>
+          <div class="mrow"><span data-i18n="sys.cpu_avg">CPU media</span><b id="c-avg">—</b></div>
           <div class="bar" id="c-bar"><i></i></div>
           <div class="cores" id="cores"></div>
           <div class="sep"></div>
-          <div class="mrow"><span>RAM</span><b id="r-val">—</b></div>
+          <div class="mrow"><span data-i18n="sys.ram">RAM</span><b id="r-val">—</b></div>
           <div class="bar" id="r-bar"><i></i></div>
           <dl class="kv kvm">
-            <div><dt>Frecuencia</dt><dd id="c-freq">—</dd></div>
-            <div><dt>Carga (1 min)</dt><dd id="c-load">—</dd></div>
-            <div><dt>Voltaje core</dt><dd id="p-volt">—</dd></div>
+            <div><dt data-i18n="sys.freq">Frecuencia</dt><dd id="c-freq">—</dd></div>
+            <div><dt data-i18n="sys.load">Carga (1 min)</dt><dd id="c-load">—</dd></div>
+            <div><dt data-i18n="sys.volt">Voltaje core</dt><dd id="p-volt">—</dd></div>
           </dl>
           <div class="sep"></div>
           <dl class="kv cols2 kvm" id="net-kv">
-            <div><dt>Conexion</dt><dd id="n-type">—</dd></div>
-            <div><dt>Red / WiFi</dt><dd id="n-ssid">—</dd></div>
-            <div><dt>IP</dt><dd id="n-ip">—</dd></div>
-            <div><dt>Gateway</dt><dd id="n-gw">—</dd></div>
-            <div class="span2"><dt>Senal</dt><dd id="n-sig">—</dd></div>
+            <div><dt data-i18n="sys.conn">Conexion</dt><dd id="n-type">—</dd></div>
+            <div><dt data-i18n="sys.wifi">Red / WiFi</dt><dd id="n-ssid">—</dd></div>
+            <div><dt data-i18n="sys.ip">IP</dt><dd id="n-ip">—</dd></div>
+            <div><dt data-i18n="sys.gateway">Gateway</dt><dd id="n-gw">—</dd></div>
+            <div class="span2"><dt data-i18n="sys.signal">Senal</dt><dd id="n-sig">—</dd></div>
           </dl>
           <div class="badges" id="thr"></div>
           <div class="badges" id="src"></div>
@@ -413,19 +418,19 @@ body.off .box .body{opacity:.55}
 
       <!-- Vídeo -->
       <section class="box" id="box-video" aria-label="Vídeo CRT">
-        <h2><span>Vídeo / CRT</span></h2>
+        <h2><span data-i18n="video.section">Vídeo / CRT</span></h2>
         <div class="body">
           <dl class="kv">
-            <div><dt>Modo</dt><dd id="v-mode">—</dd></div>
-            <div><dt>Pantalla</dt><dd id="v-type">—</dd></div>
-            <div><dt>Botones panel</dt><dd id="v-btn">—</dd></div>
+            <div><dt data-i18n="video.mode">Modo</dt><dd id="v-mode">—</dd></div>
+            <div><dt data-i18n="video.screen">Pantalla</dt><dd id="v-type">—</dd></div>
+            <div><dt data-i18n="video.buttons">Botones panel</dt><dd id="v-btn">—</dd></div>
           </dl>
         </div>
       </section>
 
       <!-- Almacenamiento -->
       <section class="box" id="box-store" aria-label="Almacenamiento y versiones">
-        <h2><span>Almacenamiento · Versiones</span></h2>
+        <h2><span data-i18n="store.section">Almacenamiento · Versiones</span></h2>
         <div class="body">
           <div class="mrow"><span>SHARE</span><b id="s-val">—</b></div>
           <div class="bar" id="s-bar"><i></i></div>
@@ -445,6 +450,37 @@ body.off .box .body{opacity:.55}
   'use strict';
   var $ = function (id) { return document.getElementById(id); };
   var DASH = '—';
+  var I18N = {};
+  var LANG = 'es';
+  var LOCALE = 'es-ES';
+
+  function t(key, fallback) {
+    if (I18N && I18N[key] != null && I18N[key] !== '') return I18N[key];
+    return fallback != null ? fallback : key;
+  }
+  function applyI18nDom() {
+    document.documentElement.lang = LANG;
+    document.querySelectorAll('[data-i18n]').forEach(function (el) {
+      var key = el.getAttribute('data-i18n');
+      if (!key) return;
+      el.textContent = t(key, el.textContent);
+    });
+  }
+  function loadI18n(lang) {
+    var next = (lang === 'en') ? 'en' : 'es';
+    if (next === LANG && Object.keys(I18N).length) return Promise.resolve(LANG);
+    return fetch('/i18n/' + next + '.json', { cache: 'no-store' })
+      .then(function (r) { if (!r.ok) throw new Error('i18n'); return r.json(); })
+      .then(function (cat) {
+        I18N = cat || {};
+        LANG = next;
+        LOCALE = next === 'en' ? 'en-US' : 'es-ES';
+        applyI18nDom();
+        return LANG;
+      })
+      .catch(function () { return LANG; });
+  }
+  loadI18n('es');
 
   function setT(id, v) {
     var el = $(id);
@@ -474,7 +510,7 @@ body.off .box .body{opacity:.55}
     if (!iso) return null;
     var d = new Date(iso);
     if (isNaN(d.getTime())) return null;
-    return d.toLocaleString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+    return d.toLocaleString(LOCALE, { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
   }
 
   /* ---------- Reloj ---------- */
@@ -499,9 +535,16 @@ body.off .box .body{opacity:.55}
       if (frame) frame.classList.remove('has');
     });
     $('cover-empty').hidden = false;
-    $('ph-text').textContent = 'Sin arte';
+    $('cover-empty').classList.remove('menu-logo');
+    $('ph-text').textContent = t('art.empty', 'Sin arte');
+  }
+  function showMenuLogo() {
+    clearArt();
+    $('cover-empty').classList.add('menu-logo');
+    $('ph-text').textContent = t('menu.title', 'En el menú');
   }
   function renderArt(map) {
+    $('cover-empty').classList.remove('menu-logo');
     cur.art = {
       image: (map && map.image) || null,
       box: (map && map.box) || null,
@@ -529,7 +572,7 @@ body.off .box .body{opacity:.55}
       frame.classList.add('has');
     });
     $('cover-empty').hidden = any;
-    if (!any) $('ph-text').textContent = 'Sin arte';
+    if (!any) $('ph-text').textContent = t('art.empty', 'Sin arte');
   }
   document.querySelectorAll('#cover-stack .cover-slot img').forEach(function (img) {
     img.addEventListener('error', function () {
@@ -541,13 +584,16 @@ body.off .box .body{opacity:.55}
       img.removeAttribute('data-url');
       var visible = document.querySelectorAll('#cover-stack .cover-slot:not([hidden])').length;
       $('cover-empty').hidden = visible > 0;
-      if (!visible) $('ph-text').textContent = 'Arte no disponible';
+      if (!visible) {
+        $('cover-empty').classList.remove('menu-logo');
+        $('ph-text').textContent = t('art.unavailable', 'Arte no disponible');
+      }
     });
   });
   $('syn-btn').addEventListener('click', function () {
     var open = $('syn').classList.toggle('open');
     $('syn-btn').setAttribute('aria-expanded', open ? 'true' : 'false');
-    $('syn-btn').textContent = open ? 'Sinopsis ▴' : 'Sinopsis ▾';
+    $('syn-btn').textContent = open ? t('game.synopsis_close', 'Sinopsis ▴') : t('game.synopsis_open', 'Sinopsis ▾');
   });
 
   /* ---------- Estado /api/now ---------- */
@@ -587,19 +633,21 @@ body.off .box .body{opacity:.55}
   }
 
   function applyNow(d) {
+    if (d && d.lang) loadI18n(d.lang);
     if (!d || !d.online) {
       document.body.classList.add('off');
-      setStatus('off', 'Offline');
-      resetGame('—', 'Sin datos');
+      setStatus('off', t('status.offline', 'Offline'));
+      resetGame('—', t('offline.nodata', 'Sin datos'));
       return;
     }
     document.body.classList.remove('off');
     if (d.state === 'menu') {
-      setStatus('menu', 'En el menú');
-      resetGame('En el menú', d.system || 'Recalbox');
+      setStatus('menu', t('status.menu', 'En el menú'));
+      resetGame(t('menu.title', 'En el menú'), d.system || 'Recalbox');
+      showMenuLogo();
       return;
     }
-    setStatus('on', d.state === 'playing' ? 'Jugando' : (d.action || 'Activo'));
+    setStatus('on', d.state === 'playing' ? t('status.playing', 'Jugando') : (d.action || t('status.active', 'Activo')));
 
     if (d.gamePath !== cur.gamePath) {
       var t = $('g-title'); t.classList.remove('fade'); void t.offsetWidth; t.classList.add('fade');
@@ -650,17 +698,22 @@ body.off .box .body{opacity:.55}
     if (title) b.title = title;
     return b;
   }
-  var FLAG_TXT = {
-    undervoltage: 'Subtensión', under_voltage: 'Subtensión', undervolt: 'Subtensión',
-    freq_cap: 'Frecuencia limitada', frequency_capped: 'Frecuencia limitada', arm_freq_capped: 'Frecuencia limitada',
-    throttled: 'Throttling', soft_temp_limit: 'Límite térmico'
-  };
   function flagLabel(f) {
     f = String(f);
     var past = /_past$/.test(f) || /^past_/.test(f);
     var base = f.replace(/_past$/, '').replace(/^past_/, '');
-    var t = FLAG_TXT[base] || base;
-    return { past: past, text: past ? t + ' (previo)' : t };
+    var map = {
+      undervoltage: t('flag.undervolt', 'Subtensión'),
+      under_voltage: t('flag.undervolt', 'Subtensión'),
+      undervolt: t('flag.undervolt', 'Subtensión'),
+      freq_cap: t('flag.freq_cap', 'Frecuencia limitada'),
+      frequency_capped: t('flag.freq_cap', 'Frecuencia limitada'),
+      arm_freq_capped: t('flag.freq_cap', 'Frecuencia limitada'),
+      throttled: t('flag.throttled', 'Throttling'),
+      soft_temp_limit: t('flag.temp_limit', 'Límite térmico')
+    };
+    var label = map[base] || base;
+    return { past: past, text: past ? label + t('flag.past', ' (previo)') : label };
   }
   function applyHw(h) {
     var thr = $('thr'), src = $('src');
@@ -671,7 +724,7 @@ body.off .box .body{opacity:.55}
       setT('hw-up', null);
       $('t-val').className = 'bigtemp';
       ['t-bar','c-bar','r-bar','s-bar'].forEach(function (i) { setBar(i, null); });
-      thr.appendChild(badge('soft', 'Sin datos de hardware'));
+      thr.appendChild(badge('soft', t('sys.hw_none', 'Sin datos de hardware')));
       return;
     }
     setT('hw-up', h.uptimeSec == null ? null : '⏱ ' + fmtUptime(h.uptimeSec));
@@ -725,7 +778,7 @@ body.off .box .body{opacity:.55}
       var typeTxt = net.typeLabel || net.type || null;
       if (typeTxt && net.iface) typeTxt = typeTxt + ' (' + net.iface + ')';
       setT('n-type', typeTxt);
-      setT('n-ssid', net.ssid || (net.type === 'ethernet' ? 'Cable' : null));
+      setT('n-ssid', net.ssid || (net.type === 'ethernet' ? t('sys.cable', 'Cable') : null));
       setT('n-ip', net.ip || null);
       setT('n-gw', net.gateway || null);
       var sig = num(net.signalDbm);
@@ -779,7 +832,7 @@ body.off .box .body{opacity:.55}
   }
 
   /* ---------- RetroAchievements ---------- */
-  function fmtN(n) { n = num(n); return n === null ? DASH : n.toLocaleString('es-ES'); }
+  function fmtN(n) { n = num(n); return n === null ? DASH : n.toLocaleString(LOCALE); }
   function raImg(u) { return typeof u === 'string' && u.indexOf('/ra-img?p=/') === 0 ? u : null; }
   function showRaDesc(text) {
     var el = $('ra-desc');
@@ -819,23 +872,23 @@ body.off .box .body{opacity:.55}
     if (d.noAchievements) {
       var none = document.createElement('li');
       none.className = 'na';
-      none.textContent = 'Este juego no tiene logros en RetroAchievements';
+      none.textContent = t('ra.none_game', 'Este juego no tiene logros en RetroAchievements');
       list.appendChild(none);
     } else if (d.completed) {
       var done = document.createElement('li');
       done.className = 'done';
-      done.textContent = 'Completado';
+      done.textContent = t('ra.done', 'Completado');
       list.appendChild(done);
       if (g) setBar('ra-bar', 100, 'ok');
     } else if (g && pending.length === 0 && d.ok && !d.progressOk) {
       var load = document.createElement('li');
       load.className = 'na';
-      load.textContent = 'Cargando logros…';
+      load.textContent = t('ra.loading', 'Cargando logros…');
       list.appendChild(load);
     } else if (!pending.length) {
       var e = document.createElement('li');
       e.className = 'na';
-      e.textContent = 'Sin logros pendientes';
+      e.textContent = t('ra.none_pending', 'Sin logros pendientes');
       list.appendChild(e);
     } else {
       pending.forEach(function (a) {
@@ -853,13 +906,13 @@ body.off .box .body{opacity:.55}
           im.src = src;
           li.appendChild(im);
         }
-        var t = document.createElement('span');
-        t.className = 't';
-        t.textContent = a.title || DASH;
+        var titleEl = document.createElement('span');
+        titleEl.className = 't';
+        titleEl.textContent = a.title || DASH;
         var p = document.createElement('span');
         p.className = 'p';
         p.textContent = '+' + fmtN(a.points);
-        li.appendChild(t);
+        li.appendChild(titleEl);
         li.appendChild(p);
         function pick() {
           list.querySelectorAll('.ra-item.sel').forEach(function (x) { x.classList.remove('sel'); });

@@ -40,6 +40,7 @@ Ahí verás el juego actual (título, sistema, flyer) y, si configuras RetroAchi
 - Logos de sistema en el carrusel (`/system-logo`) y media del scrap (`/media`)
 - Wheel/logos con resolución fuzzy cuando el scrap usa hashes distintos
 - Fuente **Arcade R** en ambas UIs
+- Idioma UI según Recalbox `system.language` (`es` / `en`; override `NP_LANG`)
 - Parseo correcto de fechas Recalbox (timestamp Unix → año)
 - Arranque con userscript EmulationStation `[start]`
 - Sin dependencias pip: Python 3 de la imagen Recalbox

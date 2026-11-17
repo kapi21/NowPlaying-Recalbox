@@ -40,6 +40,7 @@ You will see the current game (title, system, flyer) and, if you configure Retro
 - System logos in the carousel (`/system-logo`) and scrap media (`/media`)
 - Fuzzy wheel/logo matching when the scrap uses different hashes
 - **Arcade R** font on both UIs
+- UI language from Recalbox `system.language` (`es` / `en`; override `NP_LANG`)
 - Correct Recalbox date parsing (Unix timestamp → year)
 - Starts via EmulationStation `[start]` userscript
 - No pip deps: Python 3 from the Recalbox image
@@ -52,7 +53,7 @@ You will see the current game (title, system, flyer) and, if you configure Retro
 
 ## Quick start
 
-Full install: **[INSTALL.md](INSTALL.md)** (Spanish).
+Full install: **[INSTALL.en.md](INSTALL.en.md)** · [Español](INSTALL.md).
 
 ```sh
 # On Recalbox, after copying the repo to /recalbox/share/now-playing/

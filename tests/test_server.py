@@ -93,7 +93,9 @@ class TestServerLogos(unittest.TestCase):
     def test_api_now_json(self):
         code, h, body = get(self.base + '/api/now')
         self.assertEqual(code, 200)
-        self.assertIn('state', json.loads(body.decode('utf-8')))
+        data = json.loads(body.decode('utf-8'))
+        self.assertIn('state', data)
+        self.assertIn(data.get('lang'), ('es', 'en'))
 
     def test_minira_served(self):
         code, _, body = get(self.base + '/minira')

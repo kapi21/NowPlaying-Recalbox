@@ -254,12 +254,12 @@ html:-webkit-full-screen #fs-btn{display:none}
   <div class="fx-scan"></div>
   <div class="fx-vignette"></div>
 </div>
-<div id="rotate">Gira la tablet</div>
-<button type="button" id="fs-btn" aria-label="Pantalla completa">Pantalla completa</button>
+<div id="rotate" data-i18n="minira.rotate">Gira la tablet</div>
+<button type="button" id="fs-btn" aria-label="Pantalla completa" data-i18n="minira.fullscreen">Pantalla completa</button>
 <div id="toast" aria-live="polite">
   <img id="toast-badge" alt="">
   <div>
-    <div class="t-lab">Logro conseguido</div>
+    <div class="t-lab" data-i18n="minira.toast">Logro conseguido</div>
     <div class="t-title" id="toast-title"></div>
     <div class="t-pts" id="toast-pts"></div>
   </div>
@@ -282,7 +282,7 @@ html:-webkit-full-screen #fs-btn{display:none}
     </div>
   </section>
   <section class="right" id="art">
-    <div class="ph" id="art-ph">Sin caratula</div>
+    <div class="ph" id="art-ph" data-i18n="minira.art_empty">Sin caratula</div>
     <img id="art-img" alt="">
   </section>
 </main>
@@ -291,6 +291,36 @@ html:-webkit-full-screen #fs-btn{display:none}
   'use strict';
   var $ = function (id) { return document.getElementById(id); };
   var DASH = '-';
+  var I18N = {};
+  var LANG = 'es';
+  function t(key, fallback) {
+    if (I18N && I18N[key] != null && I18N[key] !== '') return I18N[key];
+    return fallback != null ? fallback : key;
+  }
+  function applyI18nDom() {
+    document.documentElement.lang = LANG;
+    document.querySelectorAll('[data-i18n]').forEach(function (el) {
+      var key = el.getAttribute('data-i18n');
+      if (!key) return;
+      el.textContent = t(key, el.textContent);
+    });
+    var fs = $('fs-btn');
+    if (fs) fs.setAttribute('aria-label', t('minira.fullscreen', 'Pantalla completa'));
+  }
+  function loadI18n(lang) {
+    var next = (lang === 'en') ? 'en' : 'es';
+    if (next === LANG && Object.keys(I18N).length) return Promise.resolve(LANG);
+    return fetch('/i18n/' + next + '.json', { cache: 'no-store' })
+      .then(function (r) { if (!r.ok) throw new Error('i18n'); return r.json(); })
+      .then(function (cat) {
+        I18N = cat || {};
+        LANG = next;
+        applyI18nDom();
+        return LANG;
+      })
+      .catch(function () { return LANG; });
+  }
+  loadI18n('es');
   var lastArt = '';
   var failedArt = {};
   var NEXT_MAX = 60; // todos los pendientes (la caja hace scroll)
@@ -461,9 +491,10 @@ html:-webkit-full-screen #fs-btn{display:none}
   }
 
   function applyNow(d) {
+    if (d && d.lang) loadI18n(d.lang);
     if (!d || !d.online) {
       enterMenuMode();
-      setText('title', 'Recalbox offline');
+      setText('title', t('minira.offline', 'Recalbox offline'));
       setText('system', null);
       setText('year', null);
       setArtCycle([], 'offline');
@@ -474,8 +505,8 @@ html:-webkit-full-screen #fs-btn{display:none}
     // Carrusel de sistemas
     if (d.state === 'system') {
       enterMenuMode();
-      setText('title', d.systemFullName || d.system || 'Sistema');
-      setText('system', 'Selecciona un juego');
+      setText('title', d.systemFullName || d.system || t('minira.system', 'Sistema'));
+      setText('system', t('minira.select_game', 'Selecciona un juego'));
       setText('year', null);
       setArtCycle(
         d.boxUrl ? [{ type: 'logo', url: d.boxUrl }] : [],
@@ -488,7 +519,7 @@ html:-webkit-full-screen #fs-btn{display:none}
     // Lista de juegos: juego (o carpeta) resaltado
     if (d.state === 'gamelist') {
       enterMenuMode();
-      var browseTitle = d.game || (d.isFolder ? 'Carpeta' : 'En el menu');
+      var browseTitle = d.game || (d.isFolder ? t('minira.folder', 'Carpeta') : t('minira.menu', 'En el menu'));
       setText('title', browseTitle);
       setText('system', d.systemFullName || d.system || null);
       setText('year', null);
@@ -503,7 +534,7 @@ html:-webkit-full-screen #fs-btn{display:none}
 
     if (d.state !== 'playing') {
       enterMenuMode();
-      setText('title', 'En el menu');
+      setText('title', t('minira.menu', 'En el menu'));
       setText('system', null);
       setText('year', null);
       setArtCycle(d.boxUrl ? [{ type: 'logo', url: d.boxUrl }] : [], 'menu');
@@ -675,22 +706,22 @@ html:-webkit-full-screen #fs-btn{display:none}
       return;
     }
     if (!d || !d.enabled || !d.ok) {
-      $('next-label').textContent = 'Cargando logros...';
+      $('next-label').textContent = t('minira.ra_loading', 'Cargando logros...');
       setRaPoll(3000);
       return;
     }
     // Hasta que RA reporte el mismo juego, no pintar el anterior
     if (!d.matchesCurrent) {
-      $('next-label').textContent = 'Cargando logros...';
+      $('next-label').textContent = t('minira.ra_loading', 'Cargando logros...');
       setRaPoll(3000);
       return;
     }
     setRaPoll(5000);
 
     if (d.noAchievements) {
-      $('next-label').textContent = 'Sin logros';
+      $('next-label').textContent = t('minira.ra_none', 'Sin logros');
     } else if (d.completed) {
-      $('next-label').textContent = 'Completado';
+      $('next-label').textContent = t('minira.ra_done', 'Completado');
     } else if (d.progressOk && Array.isArray(d.pending)) {
       var prog = progressionPending(d.pending);
       if (prog.length) {
@@ -700,17 +731,17 @@ html:-webkit-full-screen #fs-btn{display:none}
         // Sin progression pendiente: challenges / missables / win_condition
         renderNext(d.pending, 'Pendientes');
       } else {
-        $('next-label').textContent = 'Completado';
+        $('next-label').textContent = t('minira.ra_done', 'Completado');
       }
     } else if (d.currentGame && !d.progressOk) {
-      $('next-label').textContent = 'Cargando logros...';
+      $('next-label').textContent = t('minira.ra_loading', 'Cargando logros...');
     }
 
     var line = document.createElement('span');
     if (d.noAchievements) {
       line.textContent = '';
     } else if (d.completed) {
-      line.textContent = 'Completado';
+      line.textContent = t('minira.ra_done', 'Completado');
     } else if (d.currentGame && d.currentGame.total) {
       var a = fmtN(d.currentGame.achieved) || '0';
       var t = fmtN(d.currentGame.total);
@@ -771,7 +802,7 @@ html:-webkit-full-screen #fs-btn{display:none}
   function syncFsBtn() {
     var b = $('fs-btn');
     if (!b) return;
-    b.textContent = isFs() ? 'Salir pantalla completa' : 'Pantalla completa';
+    b.textContent = isFs() ? t('minira.fullscreen_exit', 'Salir pantalla completa') : t('minira.fullscreen', 'Pantalla completa');
   }
   $('fs-btn').addEventListener('click', function (e) {
     e.stopPropagation();
