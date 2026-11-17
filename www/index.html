@@ -122,8 +122,7 @@ body.off #offline{display:block}
 /* Carátula: imagen + caja + wheel en la misma columna */
 #box-cover .body{padding:calc(var(--u)*.5);gap:calc(var(--u)*.4)}
 .cover-stack{flex:1 1 0;min-height:0;display:flex;flex-direction:column;gap:calc(var(--u)*.4)}
-/* Sin slots visibles: no reservar espacio (si no, el logo menú queda centrado solo en la mitad inferior) */
-.cover-stack:not(:has(.cover-slot:not([hidden]))){display:none;flex:none}
+.cover-stack.is-empty{display:none;flex:none;height:0;overflow:hidden}
 .cover-slot{flex:1 1 0;min-height:0;display:flex;flex-direction:column;gap:.18em}
 .cover-slot[hidden]{display:none}
 .cover-slot .lab{flex:none;font-size:.68em;letter-spacing:.08em;text-transform:uppercase;color:var(--mint);opacity:.9;line-height:1}
@@ -530,10 +529,14 @@ body.off .box .body{opacity:.55}
   /* ---------- Arte (imagen + caja + wheel) ---------- */
   var cur = { gamePath: null, art: { image: null, box: null, wheel: null } };
   var ART_TYPES = ['image', 'box', 'wheel'];
+  function setCoverStackEmpty(empty) {
+    var stack = $('cover-stack');
+    if (stack) stack.classList.toggle('is-empty', !!empty);
+  }
   function clearArt() {
     cur.art = { image: null, box: null, wheel: null };
-    ART_TYPES.forEach(function (t) {
-      var slot = document.querySelector('#cover-stack .cover-slot[data-type="' + t + '"]');
+    ART_TYPES.forEach(function (typ) {
+      var slot = document.querySelector('#cover-stack .cover-slot[data-type="' + typ + '"]');
       if (!slot) return;
       var img = slot.querySelector('img');
       var frame = slot.querySelector('.cover-frame');
@@ -541,6 +544,7 @@ body.off .box .body{opacity:.55}
       if (img) { img.removeAttribute('src'); img.removeAttribute('data-url'); }
       if (frame) frame.classList.remove('has');
     });
+    setCoverStackEmpty(true);
     $('cover-empty').hidden = false;
     $('cover-empty').classList.remove('menu-logo');
     $('ph-text').textContent = t('art.empty', 'Sin arte');
@@ -550,6 +554,7 @@ body.off .box .body{opacity:.55}
     var img = document.querySelector('#cover-empty .menu-logo-img');
     var src = logoUrl || '/system-logo?id=recalboxlogo';
     if (img && img.getAttribute('src') !== src) img.src = src;
+    setCoverStackEmpty(true);
     $('cover-empty').classList.add('menu-logo');
     $('ph-text').textContent = t('menu.title', 'En el menú');
   }
@@ -561,12 +566,12 @@ body.off .box .body{opacity:.55}
       wheel: (map && map.wheel) || null
     };
     var any = false;
-    ART_TYPES.forEach(function (t) {
-      var slot = document.querySelector('#cover-stack .cover-slot[data-type="' + t + '"]');
+    ART_TYPES.forEach(function (typ) {
+      var slot = document.querySelector('#cover-stack .cover-slot[data-type="' + typ + '"]');
       if (!slot) return;
       var img = slot.querySelector('img');
       var frame = slot.querySelector('.cover-frame');
-      var url = cur.art[t];
+      var url = cur.art[typ];
       if (!url) {
         slot.hidden = true;
         if (img) { img.removeAttribute('src'); img.removeAttribute('data-url'); }
@@ -581,6 +586,7 @@ body.off .box .body{opacity:.55}
       }
       frame.classList.add('has');
     });
+    setCoverStackEmpty(!any);
     $('cover-empty').hidden = any;
     if (!any) $('ph-text').textContent = t('art.empty', 'Sin arte');
   }
