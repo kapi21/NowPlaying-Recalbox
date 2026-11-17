@@ -133,10 +133,14 @@ body.off #offline{display:block}
   text-transform:uppercase;letter-spacing:.06em;font-size:.85em;text-align:center;background:#010204;border-radius:5px;border:1px solid var(--line);position:relative}
 .cover-empty[hidden]{display:none}
 .cover-empty svg{width:min(8em,60%);max-height:50%;height:auto;opacity:.85}
-.cover-empty.menu-logo{justify-content:center}
+.cover-empty.menu-logo{justify-content:center;align-items:center}
 .cover-empty.menu-logo svg{display:none}
 .cover-empty.menu-logo #ph-text{display:none}
-.cover-empty .menu-logo-img{display:none;position:absolute;inset:8%;width:auto;height:auto;max-width:84%;max-height:84%;margin:auto;object-fit:contain;opacity:.9;pointer-events:none;filter:drop-shadow(0 0 18px rgba(63,195,224,.25))}
+.cover-empty .menu-logo-img{
+  display:none;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  width:auto;height:auto;max-width:78%;max-height:70%;object-fit:contain;
+  opacity:.95;pointer-events:none;filter:drop-shadow(0 0 18px rgba(63,195,224,.25))
+}
 .cover-empty.menu-logo .menu-logo-img{display:block}
 
 /* Ficha */
