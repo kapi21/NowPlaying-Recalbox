@@ -2,31 +2,47 @@
 
 [Español](README.md) · **English**
 
-**Now playing** and **MiniRA** on your LAN for [Recalbox](https://www.recalbox.com/): EmulationStation status, box art, system logos, and (optional) RetroAchievements.
+A lightweight web server for [Recalbox](https://www.recalbox.com/) that shows on your LAN **what you are playing**, **game art**, **Pi health**, and (optionally) **[RetroAchievements](https://retroachievements.org/)** progress.
 
-Pages are served from the Pi itself (`:8787`). Any phone, tablet, or browser on the same Wi‑Fi can open them.
+No app required: any phone, tablet, or PC on the same Wi‑Fi opens a browser and you are done. Built for a **second screen** on an arcade cabinet, living room, or desk.
 
-### Spare tablet or Android phone
+---
 
-If you have an **Android tablet or phone** sitting around, you do not need a special app: open the **browser** (Chrome, etc.), join the **same Wi‑Fi** as Recalbox, and go to:
+## What is it?
 
-```text
-http://<YOUR-RECALBOX-IP>:8787/minira
-```
+Now Playing Recalbox runs **on the Recalbox itself** (Python 3, port **8787**). It reads EmulationStation state and serves two UIs:
 
-You will see the current game (title, system, flyer) and, if you configure RetroAchievements, **achievement progress / remaining unlocks** while you play. Use **landscape** for MiniRA; `/` works in portrait or landscape as a fuller panel (“now playing” + hardware + network). The legacy `/marquee` path redirects to `/minira`.
+| Path | Purpose |
+| --- | --- |
+| **`/`** — Now Playing | Full panel: metadata, image / box / wheel, hardware, network, achievements |
+| **`/minira`** — MiniRA | Landscape tablet view: flyer + RA progress while you play |
+| `/marquee` | Legacy alias → redirects to `/minira` |
 
-> Work in progress: this v0 ships the **server core + current UI**. A more generic multi-device UI comes later. See [docs/PRODUCTIZATION.md](docs/PRODUCTIZATION.md).
+Typical uses:
+
+- Spare Android tablet in landscape as a **marquee / mini-RA** display
+- Phone or desktop browser to check **temperature, network, and current game**
+- CRT / arcade cab with a secondary device and zero extra installs
+
+> v0: server core + current UI. Roadmap: [docs/PRODUCTIZATION.md](docs/PRODUCTIZATION.md).
 
 ---
 
 ## Screenshots
 
-![Now Playing / view](docs/screenshots/mobile-now.png)
+**Now Playing (`/`)** — in-game, art and system:
+
+![Now Playing](docs/screenshots/mobile-now.png)
+
+**MiniRA (`/minira`)** — playing, with pending achievements:
 
 ![MiniRA in-game](docs/screenshots/minira-playing.png)
 
+**MiniRA** — browsing the gamelist:
+
 ![MiniRA gamelist](docs/screenshots/marquee-gamelist.png)
+
+**MiniRA** — system carousel:
 
 ![MiniRA system](docs/screenshots/marquee-system.png)
 
@@ -34,64 +50,79 @@ You will see the current game (title, system, flyer) and, if you configure Retro
 
 ## Features
 
-- **`/minira`** landscape (tablet): title, system, flyer, in-game RA achievements (badges + progress)
-- **`/`**: game metadata, art (image + box + wheel), Pi hardware, network (Wi‑Fi/IP/gateway), and RA
+- **Live EmulationStation state** (playing, menu, gamelist, systems, screensaver)
+- **Scrap art**: image, box, and wheel (fuzzy hash matching when scrap names differ)
+- **System logos** from the Recalbox theme
+- **Optional RetroAchievements**: progress, pending badges, rich presence, rank / motto
+- **Pi hardware**: temperature, CPU, RAM, throttling, video/CRT, storage, versions
+- **Network**: Wi‑Fi / ethernet, SSID, IP, gateway, signal
+- **UI language** from Recalbox `system.language` (`es` / `en`; override with `NP_LANG`)
+- **Arcade R** font; auto-start via EmulationStation `[start]` userscript
+- **No pip**: Python 3 from the Recalbox image only
 - JSON API: `/api/now`, `/api/ra`, `/api/hw`
-- System logos in the carousel (`/system-logo`) and scrap media (`/media`)
-- Fuzzy wheel/logo matching when the scrap uses different hashes
-- **Arcade R** font on both UIs
-- UI language from Recalbox `system.language` (`es` / `en`; override `NP_LANG`)
-- Correct Recalbox date parsing (Unix timestamp → year)
-- Starts via EmulationStation `[start]` userscript
-- No pip deps: Python 3 from the Recalbox image
+
+---
 
 ## Requirements
 
 - Recalbox **≥ 10** (tested on **10.1.1**)
 - Python 3 on the board
-- LAN (Recalbox share is often exFAT → run scripts with `sh …`)
+- Same LAN / Wi‑Fi for Recalbox and the client device
+- Share is often **exFAT (noexec)** → always use `sh script.sh`, not `./script.sh`
+
+---
 
 ## Quick start
 
-Full install: **[INSTALL.en.md](INSTALL.en.md)** · [Español](INSTALL.md).
+Full guide: **[INSTALL.en.md](INSTALL.en.md)** · [Español](INSTALL.md).
+
+1. Copy the repo contents to `/recalbox/share/now-playing/`
+2. (Optional) Configure RetroAchievements — see below
+3. Install userscript `userscripts/nowplaying[start].ash` into `/recalbox/share/userscripts/`
+4. Start (or restart EmulationStation):
 
 ```sh
-# On Recalbox, after copying the repo to /recalbox/share/now-playing/
 sh /recalbox/share/now-playing/start-now-playing.sh
 ```
 
-Then on your device:
+5. On the client device:
 
 ```text
-http://<RECALBOX-IP>:8787/minira
-http://<RECALBOX-IP>:8787/
+http://<YOUR-RECALBOX-IP>:8787/
+http://<YOUR-RECALBOX-IP>:8787/minira
 ```
+
+---
 
 ## RetroAchievements (optional)
 
 ```sh
 cp config/ra.local.txt.example /recalbox/share/now-playing/ra.local.txt
-# edit user= and apikey= (RA web API key)
+# Edit user= and apikey= (web API key from retroachievements.org)
 ```
 
-**Do not commit** `ra.local.txt`. Optional env vars: see `config/env.example`.
+**Do not commit** `ra.local.txt`. Environment overrides: `config/env.example`.
 
-## Layout
+---
+
+## Repository layout
 
 ```text
-server.py              # HTTP :8787
-np/                    # ES state, RA, DTOs, art, hardware, paths
-www/                   # index (/) + minira + marquee redirect
-www/fonts/             # Arcade R
-config/                # ra.local.txt / env examples
-tests/                 # unittest
-userscripts/           # nowplaying[start].ash
+server.py                 # HTTP :8787
+np/                       # ES, RA, art, hardware, locale, paths
+www/                      # Now Playing + MiniRA UI
+www/fonts/                # Arcade R
+www/i18n/                 # es / en strings
+config/                   # credential and env examples
+tests/                    # unittest
+userscripts/              # EmulationStation boot hook
 start|stop-now-playing.sh
-wake-marquee.sh        # optional (ADB not included; opens MiniRA)
-INSTALL.md
-docs/PRODUCTIZATION.md # product roadmap
-docs/screenshots/      # README screenshots
+wake-marquee.sh           # optional (ADB not included)
+INSTALL.md / INSTALL.en.md
+docs/                     # roadmap, screenshots, specs
 ```
+
+---
 
 ## Tests
 
@@ -99,14 +130,18 @@ docs/screenshots/      # README screenshots
 python3 -m unittest discover -s tests -p 'test_*.py' -v
 ```
 
-## Roadmap (short)
+---
+
+## Roadmap
 
 1. ~~Publish clean core~~ (this release)
 2. Multi-device UI / generic skin
 3. Easy discovery (hostname / QR)
-4. (Later) frontends beyond Recalbox
+4. (Longer term) frontends beyond Recalbox
 
 Details: [docs/PRODUCTIZATION.md](docs/PRODUCTIZATION.md).
+
+---
 
 ## License
 
@@ -114,4 +149,4 @@ Details: [docs/PRODUCTIZATION.md](docs/PRODUCTIZATION.md).
 
 ## Notice
 
-Intended for a **trusted local network**. Do not expose port 8787 to the Internet. Does not include ROMs or third-party secrets.
+Intended for a **trusted local network**. Do **not** expose port **8787** to the Internet. This project **does not include ROMs**, BIOS files, or third-party secrets.
