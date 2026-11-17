@@ -1,5 +1,7 @@
 # Now Playing Recalbox
 
+**Español** · [English](README.en.md)
+
 **Now playing** y **MiniRA** en la LAN para [Recalbox](https://www.recalbox.com/): estado de EmulationStation, carátulas, logos de sistema y (opcional) RetroAchievements.
 
 Sirve páginas web desde la propia Pi (`:8787`). Cualquier móvil, tablet o navegador en la misma WiFi puede abrirlas.
