@@ -24,6 +24,10 @@ Ahí verás el juego actual (título, sistema, carátula) y, si configuras Retro
 
 ![MiniRA jugando](docs/screenshots/minira-playing.png)
 
+![MiniRA gamelist](docs/screenshots/marquee-gamelist.png)
+
+![MiniRA sistema](docs/screenshots/marquee-system.png)
+
 ---
 
 ## Características
