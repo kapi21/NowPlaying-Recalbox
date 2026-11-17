@@ -18,10 +18,17 @@ PNG = (b'\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00\x01\x00\x00\x00\x01\x08
        b'\x1f\x15\xc4\x89\x00\x00\x00\rIDATx\x9cc\xf8\xff\xff?\x00\x05\xfe\x02\xfe\xa7\x9a\xa0\xa0\x00\x00\x00\x00IEND\xaeB`\x82')
 
 
-def get(url, headers=None):
+def get(url, headers=None, follow_redirects=True):
     req = urllib.request.Request(url, headers=headers or {})
+    if follow_redirects:
+        opener = urllib.request.build_opener()
+    else:
+        class _NoRedirect(urllib.request.HTTPRedirectHandler):
+            def redirect_request(self, *args, **kwargs):
+                return None
+        opener = urllib.request.build_opener(_NoRedirect)
     try:
-        with urllib.request.urlopen(req) as r:
+        with opener.open(req) as r:
             return r.status, dict(r.headers), r.read()
     except urllib.error.HTTPError as e:
         return e.code, dict(e.headers), e.read()
@@ -88,10 +95,16 @@ class TestServerLogos(unittest.TestCase):
         self.assertEqual(code, 200)
         self.assertIn('state', json.loads(body.decode('utf-8')))
 
-    def test_marquee_served(self):
-        code, _, body = get(self.base + '/marquee')
+    def test_minira_served(self):
+        code, _, body = get(self.base + '/minira')
         self.assertEqual(code, 200)
         self.assertIn(b'art-img', body)
+        self.assertIn(b'MiniRA', body)
+
+    def test_marquee_redirects_to_minira(self):
+        code, h, _ = get(self.base + '/marquee?fs=1', follow_redirects=False)
+        self.assertEqual(code, 302)
+        self.assertEqual(h.get('Location'), '/minira?fs=1')
 
     def test_unknown_404(self):
         code, _, _ = get(self.base + '/nada-aqui')

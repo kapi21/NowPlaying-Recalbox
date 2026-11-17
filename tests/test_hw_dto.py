@@ -34,6 +34,11 @@ class TestHwDto(unittest.TestCase):
             'tempC': 38.05, 'load1': 4.12, 'uptimeSec': 6885, 'freqMHz': 2400,
             'throttled': '0x0', 'voltCore': 0.8466, 'fbMode': '320x240',
             'fbInterlaced': False, 'screenType': 0, 'panelButtons': 6,
+            'network': {
+                'type': 'wifi', 'iface': 'wlan0', 'ssid': 'NENESHOME',
+                'ip': '192.168.1.184', 'gateway': '192.168.1.1',
+                'signalDbm': -49, 'bitrate': '72.2 MBit/s',
+            },
         }
         d = hw_dto(si, probe, None, None, mqtt_age_sec=0.5, probe_age_sec=2, api_online=True)
         self.assertTrue(d['mqtt']['ok'])
@@ -43,6 +48,10 @@ class TestHwDto(unittest.TestCase):
         self.assertFalse(d['video']['interlaced'])
         self.assertEqual(d['video']['screenType'], '15kHz')
         self.assertEqual(d['video']['panelButtons'], 6)
+        self.assertEqual(d['network']['typeLabel'], 'WiFi')
+        self.assertEqual(d['network']['ssid'], 'NENESHOME')
+        self.assertEqual(d['network']['ip'], '192.168.1.184')
+        self.assertEqual(d['network']['signalDbm'], -49)
 
 
 if __name__ == '__main__':

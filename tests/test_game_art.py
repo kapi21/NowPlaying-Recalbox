@@ -34,8 +34,31 @@ class TestGameArt(unittest.TestCase):
         art = build_game_art(
             game,
             exists=lambda p: p.endswith('/boxes/ms.png'),
+            list_dir=lambda _d: [],
         )
         self.assertEqual([a['type'] for a in art], ['box'])
+
+    def test_wheel_different_hash_same_title(self):
+        # Recalbox scrap: boxes/images/wheels usan hashes distintos del mismo juego
+        game = {
+            'BoxPath': '/recalbox/share/roms/fbneo/media/boxes/Cabal 408a05c07ba0cd6d40e53d8bd16cc860.png',
+            'ImagePath': '/recalbox/share/roms/fbneo/media/images/Cabal f712ea10fe21474be95a034a6098d8f1.png',
+        }
+        wheel = '/recalbox/share/roms/fbneo/media/wheels/Cabal 4893754ffdd51c1715490c2f76ce91be.png'
+        ok = {
+            game['BoxPath'],
+            game['ImagePath'],
+            wheel,
+        }
+
+        def listdir(d: str):
+            if d.endswith('/wheels'):
+                return ['Cabal 4893754ffdd51c1715490c2f76ce91be.png']
+            return []
+
+        art = build_game_art(game, exists=lambda p: p in ok, list_dir=listdir)
+        self.assertEqual([a['type'] for a in art], ['box', 'image', 'wheel'])
+        self.assertIn('4893754ffdd51c1715490c2f76ce91be', art[2]['url'])
 
     def test_dedupe_same_url(self):
         game = {

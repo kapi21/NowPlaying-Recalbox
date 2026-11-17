@@ -123,6 +123,22 @@ def hw_dto(
             'panelButtons': pr.get('panelButtons'),
         }
 
+    network = None
+    raw_net = pr.get('network') if pr else None
+    if isinstance(raw_net, dict) and (raw_net.get('type') or raw_net.get('ip') or raw_net.get('iface')):
+        ntype = raw_net.get('type')
+        label = {'wifi': 'WiFi', 'ethernet': 'Ethernet'}.get(str(ntype), ntype)
+        network = {
+            'type': ntype,
+            'typeLabel': label,
+            'iface': raw_net.get('iface'),
+            'ssid': raw_net.get('ssid'),
+            'ip': raw_net.get('ip'),
+            'gateway': raw_net.get('gateway'),
+            'signalDbm': raw_net.get('signalDbm'),
+            'bitrate': raw_net.get('bitrate'),
+        }
+
     store = None
     if storage and isinstance(storage.get('storages'), dict):
         for ent in storage['storages'].values():
@@ -164,6 +180,7 @@ def hw_dto(
         'power': power,
         'uptimeSec': pr.get('uptimeSec') if pr else None,
         'video': video,
+        'network': network,
         'storage': store,
         'versions': ver,
     }

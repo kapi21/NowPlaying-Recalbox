@@ -156,11 +156,21 @@ class Handler(SimpleHTTPRequestHandler):
             self._send_file(full, ctype, cache='public, max-age=3600')
             return
 
+        # Vista tablet: MiniRA (antes /marquee). Alias antiguo → 302.
+        if path in ('/marquee', '/marquee.html'):
+            q = parsed.query
+            loc = '/minira' + (('?' + q) if q else '')
+            self.send_response(302)
+            self.send_header('Location', loc)
+            self.send_header('Cache-Control', 'no-store')
+            self.end_headers()
+            return
+
         aliases = {
             '/': 'index.html',
             '/index.html': 'index.html',
-            '/marquee': 'marquee.html',
-            '/marquee.html': 'marquee.html',
+            '/minira': 'minira.html',
+            '/minira.html': 'minira.html',
         }
         if path in aliases:
             self._send_file(os.path.join(WWW, aliases[path]), 'text/html; charset=utf-8')

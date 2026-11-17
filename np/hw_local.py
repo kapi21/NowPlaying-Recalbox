@@ -28,6 +28,121 @@ def _vcgencmd(*args: str) -> str | None:
         return None
 
 
+def _run(*args: str, timeout: float = 2) -> str | None:
+    try:
+        out = subprocess.check_output(list(args), stderr=subprocess.DEVNULL, text=True, timeout=timeout)
+        return out.strip()
+    except (OSError, subprocess.SubprocessError):
+        return None
+
+
+def _iface_operstate(iface: str) -> str | None:
+    return _read_text(f'/sys/class/net/{iface}/operstate')
+
+
+def _parse_ipv4_addrs(text: str | None) -> dict[str, str]:
+    """Parse `ip -4 -o addr show` → {iface: ip}."""
+    out: dict[str, str] = {}
+    if not text:
+        return out
+    for line in text.splitlines():
+        # 3: wlan0    inet 192.168.1.184/24 brd ...
+        m = re.search(r'^\d+:\s+(\S+)\s+inet\s+(\d+\.\d+\.\d+\.\d+)', line)
+        if not m:
+            continue
+        iface, ip = m.group(1), m.group(2)
+        if iface == 'lo' or ip.startswith('127.'):
+            continue
+        out[iface] = ip
+    return out
+
+
+def _parse_default_route(text: str | None) -> tuple[str | None, str | None]:
+    """Parse `ip route get 1.1.1.1` → (iface, src_ip)."""
+    if not text:
+        return None, None
+    line = text.splitlines()[0]
+    iface = None
+    src = None
+    m = re.search(r'\bdev\s+(\S+)', line)
+    if m:
+        iface = m.group(1)
+    m = re.search(r'\bsrc\s+(\d+\.\d+\.\d+\.\d+)', line)
+    if m:
+        src = m.group(1)
+    return iface, src
+
+
+def _parse_wifi_link(text: str | None) -> dict[str, Any]:
+    """Parse `iw dev wlan0 link` → ssid / signal / bitrate."""
+    info: dict[str, Any] = {'ssid': None, 'signalDbm': None, 'bitrate': None}
+    if not text or 'Not connected' in text:
+        return info
+    m = re.search(r'^\s*SSID:\s*(.+)$', text, re.MULTILINE)
+    if m:
+        info['ssid'] = m.group(1).strip() or None
+    m = re.search(r'signal:\s*(-?\d+)\s*dBm', text)
+    if m:
+        try:
+            info['signalDbm'] = int(m.group(1))
+        except ValueError:
+            pass
+    m = re.search(r'tx bitrate:\s*([^\n]+)', text)
+    if m:
+        info['bitrate'] = m.group(1).strip() or None
+    return info
+
+
+def read_network() -> dict[str, Any]:
+    """Detect active iface (ethernet/wifi), IP, SSID and signal when available."""
+    net: dict[str, Any] = {
+        'type': None, 'iface': None, 'ssid': None, 'ip': None,
+        'gateway': None, 'signalDbm': None, 'bitrate': None,
+    }
+    eth_up = (_iface_operstate('eth0') or '').lower() == 'up'
+    wlan_up = (_iface_operstate('wlan0') or '').lower() == 'up'
+    addrs = _parse_ipv4_addrs(_run('ip', '-4', '-o', 'addr', 'show'))
+    route_iface, route_src = _parse_default_route(_run('ip', 'route', 'get', '1.1.1.1'))
+
+    iface = None
+    if route_iface in ('eth0', 'wlan0'):
+        iface = route_iface
+    elif eth_up and 'eth0' in addrs:
+        iface = 'eth0'
+    elif wlan_up and 'wlan0' in addrs:
+        iface = 'wlan0'
+    elif eth_up:
+        iface = 'eth0'
+    elif wlan_up:
+        iface = 'wlan0'
+
+    if not iface:
+        return net
+
+    net['iface'] = iface
+    if iface.startswith('wlan'):
+        net['type'] = 'wifi'
+    elif iface.startswith('eth'):
+        net['type'] = 'ethernet'
+    else:
+        net['type'] = iface
+
+    net['ip'] = addrs.get(iface) or route_src
+    if route_iface == iface:
+        # gateway from default route line if present
+        route = _run('ip', 'route', 'get', '1.1.1.1') or ''
+        m = re.search(r'\bvia\s+(\d+\.\d+\.\d+\.\d+)', route)
+        if m:
+            net['gateway'] = m.group(1)
+
+    if net['type'] == 'wifi':
+        link = _parse_wifi_link(_run('iw', 'dev', iface, 'link'))
+        net['ssid'] = link.get('ssid')
+        net['signalDbm'] = link.get('signalDbm')
+        net['bitrate'] = link.get('bitrate')
+    return net
+
+
 def parse_fb_mode(modes: str | None, virtual_size: str | None) -> tuple[str | None, bool]:
     """Parse framebuffer mode from sysfs (same contract as PC SSH probe)."""
     if modes:
@@ -74,7 +189,7 @@ def read_local_probe() -> dict[str, Any]:
     probe: dict[str, Any] = {
         'tempC': None, 'freqMHz': None, 'load1': None, 'uptimeSec': None,
         'voltCore': None, 'throttled': None, 'fbMode': None, 'fbInterlaced': None,
-        'screenType': None, 'panelButtons': None,
+        'screenType': None, 'panelButtons': None, 'network': None,
     }
 
     raw_temp = _read_text('/sys/class/thermal/thermal_zone0/temp')
@@ -137,5 +252,10 @@ def read_local_probe() -> dict[str, Any]:
         probe['screenType'] = st
         probe['panelButtons'] = pb
         break
+
+    try:
+        probe['network'] = read_network()
+    except Exception:
+        probe['network'] = None
 
     return probe

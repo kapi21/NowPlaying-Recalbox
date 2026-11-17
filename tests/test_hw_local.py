@@ -4,7 +4,10 @@ import tempfile
 import unittest
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from np.hw_local import parse_fb_mode, parse_crt_options, read_local_probe
+from np.hw_local import (
+    parse_fb_mode, parse_crt_options, read_local_probe,
+    _parse_ipv4_addrs, _parse_default_route, _parse_wifi_link,
+)
 
 
 class TestParseFbMode(unittest.TestCase):
@@ -61,8 +64,34 @@ class TestReadLocalProbeShape(unittest.TestCase):
     def test_keys_present(self):
         # On Windows (dev) most sysfs paths missing → still returns dict with CRT keys
         p = read_local_probe()
-        for k in ('fbMode', 'fbInterlaced', 'screenType', 'panelButtons', 'tempC', 'throttled'):
+        for k in ('fbMode', 'fbInterlaced', 'screenType', 'panelButtons', 'tempC', 'throttled', 'network'):
             self.assertIn(k, p)
+
+
+class TestNetworkParsers(unittest.TestCase):
+    def test_ipv4_addrs(self):
+        text = (
+            "1: lo    inet 127.0.0.1/8 scope host lo\n"
+            "3: wlan0    inet 192.168.1.184/24 brd 192.168.1.255 scope global dynamic noprefixroute wlan0\n"
+        )
+        self.assertEqual(_parse_ipv4_addrs(text), {'wlan0': '192.168.1.184'})
+
+    def test_default_route(self):
+        iface, src = _parse_default_route('1.1.1.1 via 192.168.1.1 dev wlan0  src 192.168.1.184')
+        self.assertEqual(iface, 'wlan0')
+        self.assertEqual(src, '192.168.1.184')
+
+    def test_wifi_link(self):
+        text = (
+            "Connected to aa:bb:cc:dd:ee:ff (on wlan0)\n"
+            "\tSSID: NENESHOME\n"
+            "\tsignal: -49 dBm\n"
+            "\ttx bitrate: 72.2 MBit/s\n"
+        )
+        info = _parse_wifi_link(text)
+        self.assertEqual(info['ssid'], 'NENESHOME')
+        self.assertEqual(info['signalDbm'], -49)
+        self.assertEqual(info['bitrate'], '72.2 MBit/s')
 
 
 if __name__ == '__main__':
