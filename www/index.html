@@ -133,9 +133,10 @@ body.off #offline{display:block}
   text-transform:uppercase;letter-spacing:.06em;font-size:.85em;text-align:center;background:#010204;border-radius:5px;border:1px solid var(--line);position:relative}
 .cover-empty[hidden]{display:none}
 .cover-empty svg{width:min(8em,60%);max-height:50%;height:auto;opacity:.85}
+.cover-empty.menu-logo{justify-content:center}
 .cover-empty.menu-logo svg{display:none}
-.cover-empty.menu-logo #ph-text{position:relative;z-index:1;color:var(--cyan);text-shadow:0 0 12px rgba(63,195,224,.35)}
-.cover-empty .menu-logo-img{display:none;position:absolute;inset:12%;width:auto;height:auto;max-width:76%;max-height:76%;margin:auto;object-fit:contain;opacity:.55;pointer-events:none}
+.cover-empty.menu-logo #ph-text{display:none}
+.cover-empty .menu-logo-img{display:none;position:absolute;inset:8%;width:auto;height:auto;max-width:84%;max-height:84%;margin:auto;object-fit:contain;opacity:.9;pointer-events:none;filter:drop-shadow(0 0 18px rgba(63,195,224,.25))}
 .cover-empty.menu-logo .menu-logo-img{display:block}
 
 /* Ficha */
@@ -332,7 +333,7 @@ body.off .box .body{opacity:.55}
           </div>
         </div>
         <div class="cover-empty" id="cover-empty">
-          <img class="menu-logo-img" src="/system-logo?id=recalbox" alt="" aria-hidden="true">
+          <img class="menu-logo-img" src="/system-logo?id=recalboxlogo" alt="" aria-hidden="true">
           <svg viewBox="0 0 120 90" fill="none" stroke="#3FC3E0" stroke-width="3" aria-hidden="true">
             <rect x="8" y="8" width="104" height="62" rx="6"/><path d="M40 82h40M60 70v12"/>
             <path d="M44 28l22 12-22 12z" fill="#F0507A" stroke="#F0507A"/>
@@ -538,8 +539,11 @@ body.off .box .body{opacity:.55}
     $('cover-empty').classList.remove('menu-logo');
     $('ph-text').textContent = t('art.empty', 'Sin arte');
   }
-  function showMenuLogo() {
+  function showMenuLogo(logoUrl) {
     clearArt();
+    var img = document.querySelector('#cover-empty .menu-logo-img');
+    var src = logoUrl || '/system-logo?id=recalboxlogo';
+    if (img && img.getAttribute('src') !== src) img.src = src;
     $('cover-empty').classList.add('menu-logo');
     $('ph-text').textContent = t('menu.title', 'En el menú');
   }
@@ -644,7 +648,7 @@ body.off .box .body{opacity:.55}
     if (d.state === 'menu') {
       setStatus('menu', t('status.menu', 'En el menú'));
       resetGame(t('menu.title', 'En el menú'), d.system || 'Recalbox');
-      showMenuLogo();
+      showMenuLogo(d.boxUrl || '/system-logo?id=recalboxlogo');
       return;
     }
     setStatus('on', d.state === 'playing' ? t('status.playing', 'Jugando') : (d.action || t('status.active', 'Activo')));
