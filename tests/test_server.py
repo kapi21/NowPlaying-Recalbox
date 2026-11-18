@@ -95,7 +95,14 @@ class TestServerLogos(unittest.TestCase):
         self.assertEqual(code, 200)
         data = json.loads(body.decode('utf-8'))
         self.assertIn('state', data)
-        self.assertIn(data.get('lang'), ('es', 'en'))
+        self.assertIn(data.get('lang'), ('es', 'en', 'fr'))
+        self.assertEqual(data.get('hostname'), server.HOSTNAME)
+        self.assertTrue(data.get('hostname'))
+
+    def test_qr_lib_served(self):
+        code, _, body = get(self.base + '/vendor/qrcode.js')
+        self.assertEqual(code, 200)
+        self.assertIn(b'createSvgTag', body)
 
     def test_minira_served(self):
         code, _, body = get(self.base + '/minira')

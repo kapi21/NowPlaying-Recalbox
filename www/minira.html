@@ -237,6 +237,26 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--white);
 }
 .right.has .ph{display:none}
 
+#qr{
+  display:none;position:absolute;z-index:2;
+  left:calc(var(--u)*.7);bottom:calc(var(--u)*.45);
+  align-items:center;gap:calc(var(--u)*.4);pointer-events:none;
+}
+#app.menu-mode #qr.ready{display:flex}
+#qr-code{
+  width:calc(var(--u)*4.6);height:calc(var(--u)*4.6);flex:none;
+  border-radius:4px;overflow:hidden;box-shadow:0 0 16px rgba(63,195,224,.25);
+}
+#qr-code svg{display:block;width:100%;height:100%}
+#qr-txt{display:flex;flex-direction:column;gap:.3em;min-width:0}
+#qr-lab{
+  font-size:calc(var(--tu)*.62);letter-spacing:.06em;text-transform:uppercase;color:var(--mint);
+}
+#qr-url{
+  font-size:calc(var(--tu)*.62);letter-spacing:.02em;text-transform:uppercase;color:var(--cyan);
+  overflow-wrap:anywhere;
+}
+
 #fs-btn{
   position:fixed;z-index:40;right:12px;bottom:12px;min-width:9em;min-height:2.4em;
   font:inherit;font-size:calc(var(--tu)*.55);letter-spacing:.06em;text-transform:uppercase;
@@ -285,7 +305,15 @@ html:-webkit-full-screen #fs-btn{display:none}
     <div class="ph" id="art-ph" data-i18n="minira.art_empty">Sin caratula</div>
     <img id="art-img" alt="">
   </section>
+  <div id="qr" aria-hidden="true">
+    <div id="qr-code"></div>
+    <div id="qr-txt">
+      <div id="qr-lab" data-i18n="minira.qr">Abre en tu movil</div>
+      <div id="qr-url"></div>
+    </div>
+  </div>
 </main>
+<script src="/vendor/qrcode.js"></script>
 <script>
 (function () {
   'use strict';
@@ -307,8 +335,9 @@ html:-webkit-full-screen #fs-btn{display:none}
     var fs = $('fs-btn');
     if (fs) fs.setAttribute('aria-label', t('minira.fullscreen', 'Pantalla completa'));
   }
+  var LANGS = { es: 1, en: 1, fr: 1 };
   function loadI18n(lang) {
-    var next = (lang === 'en') ? 'en' : 'es';
+    var next = LANGS[lang] ? lang : 'en';
     if (next === LANG && Object.keys(I18N).length) return Promise.resolve(LANG);
     return fetch('/i18n/' + next + '.json', { cache: 'no-store' })
       .then(function (r) { if (!r.ok) throw new Error('i18n'); return r.json(); })
@@ -490,8 +519,27 @@ html:-webkit-full-screen #fs-btn{display:none}
     setRaPoll(10000);
   }
 
+  var qrUrl = '';
+  function updateQr(host) {
+    var box = $('qr');
+    if (!host || typeof qrcode !== 'function') { box.classList.remove('ready'); return; }
+    var h = String(host).toLowerCase();
+    if (h.indexOf('.') < 0) h += '.local';
+    var url = 'http://' + h + (location.port ? ':' + location.port : '') + '/';
+    if (url !== qrUrl) {
+      var qr = qrcode(0, 'M');
+      qr.addData(url);
+      qr.make();
+      $('qr-code').innerHTML = qr.createSvgTag({ cellSize: 4, margin: 8, scalable: true });
+      $('qr-url').textContent = url.replace(/^http:\/\//, '').replace(/\/$/, '');
+      qrUrl = url;
+    }
+    box.classList.add('ready');
+  }
+
   function applyNow(d) {
     if (d && d.lang) loadI18n(d.lang);
+    updateQr(d && d.online ? d.hostname : null);
     if (!d || !d.online) {
       enterMenuMode();
       setText('title', t('minira.offline', 'Recalbox offline'));
@@ -726,10 +774,10 @@ html:-webkit-full-screen #fs-btn{display:none}
       var prog = progressionPending(d.pending);
       if (prog.length) {
         // Camino principal primero
-        renderNext(prog, 'Progresion');
+        renderNext(prog, t('minira.progresion', 'Progresion'));
       } else if (d.pending.length) {
         // Sin progression pendiente: challenges / missables / win_condition
-        renderNext(d.pending, 'Pendientes');
+        renderNext(d.pending, t('minira.pending', 'Pendientes'));
       } else {
         $('next-label').textContent = t('minira.ra_done', 'Completado');
       }

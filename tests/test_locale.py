@@ -13,9 +13,24 @@ class TestNormalizeLang(unittest.TestCase):
     def test_en_us(self):
         self.assertEqual(normalize_lang('en_US'), 'en')
 
+    def test_fr_fr(self):
+        self.assertEqual(normalize_lang('fr_FR'), 'fr')
+        self.assertEqual(normalize_lang('fr-CA'), 'fr')
+
     def test_unsupported_falls_to_en(self):
-        self.assertEqual(normalize_lang('fr_FR'), 'en')
         self.assertEqual(normalize_lang('zh_CN'), 'en')
+        self.assertEqual(normalize_lang('de_DE'), 'en')
+
+    def test_every_supported_lang_has_catalog(self):
+        from np.locale import SUPPORTED
+        i18n = os.path.join(os.path.dirname(__file__), '..', 'www', 'i18n')
+        import json
+        with open(os.path.join(i18n, 'es.json'), encoding='utf-8') as f:
+            ref = set(json.load(f))
+        for code in SUPPORTED:
+            with open(os.path.join(i18n, code + '.json'), encoding='utf-8') as f:
+                keys = set(json.load(f))
+            self.assertEqual(keys, ref, code)
 
     def test_empty_falls_to_en(self):
         self.assertEqual(normalize_lang(None), 'en')

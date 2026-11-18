@@ -65,7 +65,11 @@ Not shipped in this repo. To wake an Android tablet at boot:
 
 ## Language
 
-UI language follows Recalbox `system.language` (`es` / `en`; others fall back to English). Override with `NP_LANG=en` or `NP_LANG=es` (see `config/env.example`).
+UI language follows Recalbox `system.language` (`es` / `en` / `fr`; others fall back to English). Override with `NP_LANG=es|en|fr` (see `config/env.example`).
+
+## Access by name and QR code
+
+Recalbox announces its name over mDNS: `http://<hostname>.local:8787/` (by default `http://recalbox.local:8787/`). In the menu, MiniRA shows a QR code to that address. To put a different name in the QR, export `NP_HOSTNAME=...`. Some older Android phones cannot resolve `.local`: use the IP instead.
 
 ## Tests (PC or Pi)
 

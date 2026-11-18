@@ -4,7 +4,7 @@ import os
 import time
 from typing import Any
 
-SUPPORTED = frozenset({'es', 'en'})
+SUPPORTED = frozenset({'es', 'en', 'fr'})
 DEFAULT_CONF = '/recalbox/share/system/recalbox.conf'
 
 _cache_lang: str | None = None
@@ -55,7 +55,7 @@ def resolve_lang(
     cache_ttl: float = 60.0,
     environ: dict[str, str] | None = None,
 ) -> str:
-    """Return 'es' or 'en'. NP_LANG overrides recalbox.conf. Cached for cache_ttl seconds."""
+    """Return a SUPPORTED code (fallback 'en'). NP_LANG overrides recalbox.conf. Cached for cache_ttl seconds."""
     global _cache_lang, _cache_at
     env = environ if environ is not None else os.environ
     now = time.monotonic()

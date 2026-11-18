@@ -56,7 +56,8 @@ Typical uses:
 - **Optional RetroAchievements**: progress, pending badges, rich presence, rank / motto
 - **Pi hardware**: temperature, CPU, RAM, throttling, video/CRT, storage, versions
 - **Network**: Wi‑Fi / ethernet, SSID, IP, gateway, signal
-- **UI language** from Recalbox `system.language` (`es` / `en`; override with `NP_LANG`)
+- **UI language** from Recalbox `system.language` (`es` / `en` / `fr`; override with `NP_LANG`)
+- **QR code in MiniRA** (menu only) pointing to `http://<hostname>.local:8787/` to open Now Playing on a phone
 - **Arcade R** font; auto-start via EmulationStation `[start]` userscript
 - **No pip**: Python 3 from the Recalbox image only
 - JSON API: `/api/now`, `/api/ra`, `/api/hw`
@@ -112,7 +113,8 @@ server.py                 # HTTP :8787
 np/                       # ES, RA, art, hardware, locale, paths
 www/                      # Now Playing + MiniRA UI
 www/fonts/                # Arcade R
-www/i18n/                 # es / en strings
+www/i18n/                 # es / en / fr strings
+www/vendor/qrcode.js      # QR generator (MIT, Kazuhiko Arase)
 config/                   # credential and env examples
 tests/                    # unittest
 userscripts/              # EmulationStation boot hook
@@ -136,7 +138,7 @@ python3 -m unittest discover -s tests -p 'test_*.py' -v
 
 1. ~~Publish clean core~~ (this release)
 2. Multi-device UI / generic skin
-3. Easy discovery (hostname / QR)
+3. ~~Easy discovery (hostname / QR)~~
 4. (Longer term) frontends beyond Recalbox
 
 Details: [docs/PRODUCTIZATION.md](docs/PRODUCTIZATION.md).

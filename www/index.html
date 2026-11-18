@@ -473,15 +473,16 @@ body.off .box .body{opacity:.55}
       el.textContent = t(key, el.textContent);
     });
   }
+  var LOCALES = { es: 'es-ES', en: 'en-US', fr: 'fr-FR' };
   function loadI18n(lang) {
-    var next = (lang === 'en') ? 'en' : 'es';
+    var next = LOCALES[lang] ? lang : 'en';
     if (next === LANG && Object.keys(I18N).length) return Promise.resolve(LANG);
     return fetch('/i18n/' + next + '.json', { cache: 'no-store' })
       .then(function (r) { if (!r.ok) throw new Error('i18n'); return r.json(); })
       .then(function (cat) {
         I18N = cat || {};
         LANG = next;
-        LOCALE = next === 'en' ? 'en-US' : 'es-ES';
+        LOCALE = LOCALES[next];
         applyI18nDom();
         return LANG;
       })

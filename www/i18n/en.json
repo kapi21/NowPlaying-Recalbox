@@ -76,5 +76,7 @@
   "minira.ra_loading": "Loading achievements...",
   "minira.ra_none": "No achievements",
   "minira.ra_done": "Completed",
-  "minira.progresion": "PROGRESS"
+  "minira.progresion": "PROGRESS",
+  "minira.pending": "Pending",
+  "minira.qr": "Open on your phone"
 }

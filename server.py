@@ -4,6 +4,7 @@ from __future__ import annotations
 import json
 import mimetypes
 import os
+import socket
 import sys
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import parse_qs, unquote, urlparse
@@ -27,6 +28,8 @@ SYSTEM_LOGO_ROOT = os.environ.get(
 CUSTOM_LOGO_ROOT = os.environ.get('NP_CUSTOM_LOGO_ROOT', os.path.join(ROOT, 'logos'))
 ES_STATE = os.environ.get('NP_ES_STATE', '/tmp/es_state.inf')
 RA_CREDS = os.environ.get('NP_RA_CREDS', os.path.join(ROOT, 'ra.local.txt'))
+# Avahi anuncia <hostname>.local: lo usa el QR de MiniRA
+HOSTNAME = os.environ.get('NP_HOSTNAME') or socket.gethostname()
 
 STATE = NowPlayingState(
     api_base=API_BASE,
@@ -104,6 +107,7 @@ class Handler(SimpleHTTPRequestHandler):
             dto = STATE.build_now()
             if isinstance(dto, dict):
                 dto['lang'] = resolve_lang()
+                dto['hostname'] = HOSTNAME
             body = json.dumps(dto, ensure_ascii=False).encode('utf-8')
             self._send(200, body, 'application/json; charset=utf-8')
             return

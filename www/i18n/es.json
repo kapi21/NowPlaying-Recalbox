@@ -76,5 +76,7 @@
   "minira.ra_loading": "Cargando logros...",
   "minira.ra_none": "Sin logros",
   "minira.ra_done": "Completado",
-  "minira.progresion": "PROGRESION"
+  "minira.progresion": "PROGRESION",
+  "minira.pending": "Pendientes",
+  "minira.qr": "Abre en tu movil"
 }

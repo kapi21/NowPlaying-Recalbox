@@ -56,7 +56,8 @@ Casos de uso típicos:
 - **RetroAchievements** opcional: progreso, badges pendientes, rich presence, rango / lema
 - **Hardware Pi**: temperatura, CPU, RAM, throttling, vídeo/CRT, almacenamiento, versiones
 - **Red**: Wi‑Fi / cable, SSID, IP, gateway, señal
-- **Idioma UI** según `system.language` de Recalbox (`es` / `en`; override `NP_LANG`)
+- **Idioma UI** según `system.language` de Recalbox (`es` / `en` / `fr`; override `NP_LANG`)
+- **QR en MiniRA** (en el menú) hacia `http://<hostname>.local:8787/` para abrir Now Playing desde el móvil
 - Fuente **Arcade R**; arranque automático con userscript ES `[start]`
 - **Sin pip**: solo Python 3 de la imagen Recalbox
 - API JSON: `/api/now`, `/api/ra`, `/api/hw`
@@ -88,7 +89,7 @@ sh /recalbox/share/now-playing/start-now-playing.sh
 5. En el dispositivo cliente:
 
 ```text
-http://<IP-DE-TU-RECALBOX>:8787/
+http://recalbox.local:8787/          # nombre mDNS (hostname de la placa + .local)
 http://<IP-DE-TU-RECALBOX>:8787/minira
 ```
 
@@ -112,7 +113,8 @@ server.py                 # HTTP :8787
 np/                       # ES, RA, arte, hardware, locale, paths
 www/                      # UI Now Playing + MiniRA
 www/fonts/                # Arcade R
-www/i18n/                 # cadenas es / en
+www/i18n/                 # cadenas es / en / fr
+www/vendor/qrcode.js      # generador QR (MIT, Kazuhiko Arase)
 config/                   # ejemplos de credenciales y entorno
 tests/                    # unittest
 userscripts/              # arranque con EmulationStation
@@ -136,7 +138,7 @@ python3 -m unittest discover -s tests -p 'test_*.py' -v
 
 1. ~~Publicar núcleo limpio~~ (esta release)
 2. UI multi-dispositivo / skin genérica
-3. Descubrimiento fácil (hostname / QR)
+3. ~~Descubrimiento fácil (hostname / QR)~~
 4. (Largo plazo) otros frontends además de Recalbox
 
 Detalle: [docs/PRODUCTIZATION.md](docs/PRODUCTIZATION.md).
