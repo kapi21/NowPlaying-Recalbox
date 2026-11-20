@@ -112,7 +112,7 @@ cp config/ra.local.txt.example /recalbox/share/now-playing/ra.local.txt
 server.py                 # HTTP :8787
 np/                       # ES, RA, art, hardware, locale, paths
 www/                      # Now Playing + MiniRA UI
-www/fonts/                # Arcade R
+www/fonts/                # Arcade R (ver THIRD_PARTY.md)
 www/i18n/                 # es / en / fr strings
 www/vendor/qrcode.js      # QR generator (MIT, Kazuhiko Arase)
 config/                   # credential and env examples

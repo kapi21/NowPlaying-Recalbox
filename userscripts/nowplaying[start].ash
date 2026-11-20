@@ -1,5 +1,5 @@
 #!/bin/ash
-# ES event Start — Now Playing + wake P80X
+# ES event Start — Now Playing + wake de la tablet (opcional)
 NP=/recalbox/share/now-playing
 [ -f "$NP/start-now-playing.sh" ] || exit 0
 sh "$NP/start-now-playing.sh" || true
