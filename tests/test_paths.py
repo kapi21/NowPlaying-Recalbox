@@ -5,7 +5,7 @@ import unittest
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from np.paths import (
-    share_relative, is_safe_relative, media_url, resolve_share_file,
+    share_relative, is_safe_relative, is_servable_media, media_url, resolve_share_file,
     is_safe_system_id, system_logo_url, resolve_system_logo,
 )
 
@@ -60,6 +60,18 @@ class TestSystemLogoPaths(unittest.TestCase):
             self.assertIsNone(resolve_system_logo(td, 'missing'))
             self.assertIsNone(resolve_system_logo(td, '../fbneo'))
 
+
+
+class ServableMediaTests(unittest.TestCase):
+    def test_images_ok(self):
+        self.assertTrue(is_servable_media('roms/fbneo/media/images/a.PNG'))
+
+    def test_blocks_non_images_and_sensitive_dirs(self):
+        self.assertFalse(is_servable_media('system/recalbox.conf'))
+        self.assertFalse(is_servable_media('now-playing/ra.local.txt'))
+        self.assertFalse(is_servable_media('system/x.png'))
+        self.assertFalse(is_servable_media('roms/fbneo/a.zip'))
+        self.assertFalse(is_servable_media('../a.png'))
 
 if __name__ == '__main__':
     unittest.main()

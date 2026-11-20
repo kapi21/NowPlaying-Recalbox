@@ -14,6 +14,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')
 import server  # noqa: E402
 from http.server import ThreadingHTTPServer  # noqa: E402
 
+CRLF = chr(13) + chr(10)
 PNG = (b'\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00\x01\x00\x00\x00\x01\x08\x06\x00\x00\x00'
        b'\x1f\x15\xc4\x89\x00\x00\x00\rIDATx\x9cc\xf8\xff\xff?\x00\x05\xfe\x02\xfe\xa7\x9a\xa0\xa0\x00\x00\x00\x00IEND\xaeB`\x82')
 
@@ -114,6 +115,40 @@ class TestServerLogos(unittest.TestCase):
         code, h, _ = get(self.base + '/marquee?fs=1', follow_redirects=False)
         self.assertEqual(code, 302)
         self.assertEqual(h.get('Location'), '/minira?fs=1')
+
+    def test_static_path_traversal_blocked(self):
+        import socket
+        port = self.httpd.server_address[1]
+        for target in ('/../server.py', '/%2e%2e/server.py', '/../../../../etc/passwd'):
+            with socket.create_connection(('127.0.0.1', port)) as sk:
+                sk.sendall(('GET %s HTTP/1.0' % target + CRLF + 'Host: x' + CRLF + CRLF).encode())
+                resp = b''
+                while True:
+                    c = sk.recv(4096)
+                    if not c:
+                        break
+                    resp += c
+            self.assertIn(b' 404 ', resp.split(CRLF.encode(), 1)[0], target)
+            self.assertNotIn(b'NowPlayingState', resp, target)
+
+    def test_media_serves_images_only(self):
+        share = tempfile.TemporaryDirectory()
+        try:
+            os.makedirs(os.path.join(share.name, 'system'))
+            os.makedirs(os.path.join(share.name, 'roms'))
+            with open(os.path.join(share.name, 'system', 'recalbox.conf'), 'w') as f:
+                f.write('wifi.key=secret')
+            with open(os.path.join(share.name, 'roms', 'a.png'), 'wb') as f:
+                f.write(PNG)
+            old = server.SHARE_ROOT
+            server.SHARE_ROOT = share.name
+            try:
+                self.assertEqual(get(self.base + '/media?path=roms/a.png')[0], 200)
+                self.assertEqual(get(self.base + '/media?path=system/recalbox.conf')[0], 400)
+            finally:
+                server.SHARE_ROOT = old
+        finally:
+            share.cleanup()
 
     def test_unknown_404(self):
         code, _, _ = get(self.base + '/nada-aqui')

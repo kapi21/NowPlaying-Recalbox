@@ -36,6 +36,20 @@ def media_url(recalbox_path: str) -> str | None:
     return '/media?path=' + enc
 
 
+MEDIA_EXTS = ('.png', '.jpg', '.jpeg', '.webp', '.gif')
+MEDIA_BLOCKED_TOP = ('system', 'now-playing', 'saves', 'bios')
+
+
+def is_servable_media(rel: str) -> bool:
+    """Solo imagenes y fuera de carpetas sensibles (config, credenciales, saves)."""
+    if not is_safe_relative(rel):
+        return False
+    n = str(rel).replace(chr(92), '/').strip()
+    if os.path.splitext(n)[1].lower() not in MEDIA_EXTS:
+        return False
+    return n.split('/')[0].lower() not in MEDIA_BLOCKED_TOP
+
+
 def resolve_share_file(share_root: str, rel: str) -> str | None:
     if not is_safe_relative(rel):
         return None

@@ -13,7 +13,7 @@ ROOT = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, ROOT)
 
 from np.locale import resolve_lang  # noqa: E402
-from np.paths import is_safe_relative, resolve_share_file, is_safe_system_id, resolve_system_logo, resolve_custom_logo  # noqa: E402
+from np.paths import is_servable_media, resolve_share_file, is_safe_system_id, resolve_system_logo, resolve_custom_logo  # noqa: E402
 from np.ra_fetch import fetch_ra_img  # noqa: E402
 from np.state import NowPlayingState  # noqa: E402
 
@@ -152,7 +152,7 @@ class Handler(SimpleHTTPRequestHandler):
         if path == '/media':
             qs = parse_qs(parsed.query)
             rel = unquote((qs.get('path') or [''])[0])
-            if not rel or not is_safe_relative(rel):
+            if not rel or not is_servable_media(rel):
                 self._send(400, b'Invalid path', 'text/plain; charset=utf-8')
                 return
             full = resolve_share_file(SHARE_ROOT, rel)
@@ -191,8 +191,9 @@ class Handler(SimpleHTTPRequestHandler):
 
         if path.startswith('/'):
             rel = path.lstrip('/').replace('/', os.sep)
-            fp = os.path.join(WWW, rel)
-            if os.path.isfile(fp):
+            wroot = os.path.realpath(WWW)
+            fp = os.path.realpath(os.path.join(wroot, rel))
+            if fp.startswith(wroot + os.sep) and os.path.isfile(fp):
                 self._send_file(fp)
                 return
 
